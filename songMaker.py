@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Allows the user to play songs from this http://resistorsings.com/106/
+Allows the user to play songs from this http://resistorsings.com/10/6
 """
 
 from interact import typeLettersTime, typeLetterTime
