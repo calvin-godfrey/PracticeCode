@@ -26,22 +26,27 @@ for i in pages: #For each page to get vocab from
     words = regex.findall(str(soup)) #Creates list of all instances of the regex
     for i in words:
         words[words.index(i)] = i[:-1] #Removes open carot symbol
+        i = i[:-1]
+        if i[2] == ".":
+            words[words.index(i)] = i[4:] #Removes digits/space at start
+        if i[1] == ".":
+            words[words.index(i)] = i[3:]
     for i in range(0, len(words), 2):
         vocab.append([unicode(words[i], "utf-8"), unicode(words[i+1], "utf-8")]) #Converts to unicode (accents) and pairs english/spanish
+
                 
     print "DONE WITH PAGE"
-
 while True:
     total += 1.0 #Another question asked
     x = random.randint(0, len(vocab)+1) #Pick random vocab word
-    print x[0]
-    x = raw_input("Answer:\n> ")
-    if x.lower() == x[1].lower(): #Right answer
+    print vocab[x][0]
+    ans = raw_input("Answer:\n> ")
+    if ans.lower() == vocab[x][1].lower(): #Right answer
         print "Woo"
         right += 1.0
     else:
         print "Wrong"
-        print x[1]
+        print vocab[x][1]
         
     print "Accents: áéíóúñ" #To help people get those right
     print "Score: " + str(right/total)
