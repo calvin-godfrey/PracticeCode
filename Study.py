@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import bs4, requests, re, random
 #Only thing that changes in each URL
 pages = ['121', '122', '123', '124', '125', '126', '310', '312', '313', '314', '315', '316', '420', '421', '422', '500']
