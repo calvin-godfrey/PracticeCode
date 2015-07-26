@@ -1,1 +1,1 @@
-import string;check_pangram=lambda t:all(i in t.lower()for i in string.ascii_lowercase
+import string;check_pangram=lambda t:all(i in t.lower()for i in string.ascii_lowercase)
