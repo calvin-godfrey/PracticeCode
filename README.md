@@ -1,3 +1,2 @@
 # PracticeCode
-So I can have more contributions than Shaun
-Swiggy swag get out of that bag
+Contains a variety of random short little programs I've made over the years
