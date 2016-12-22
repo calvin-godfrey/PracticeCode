@@ -31,7 +31,8 @@ window.onload = function(){
   };
 
   point.prototype.draw = function(){
-    var radius = 2*this.base*(this.getOldDistance()/MAX_DIST);
+    var ratio = this.getOldDistance()/MAX_DIST;
+    var radius = this.base;
     ctx.beginPath();
     ctx.moveTo(this.prevX, this.prevY);
     ctx.arc(this.prevX, this.prevY, radius, 0, Math.PI*2);
