@@ -5,7 +5,7 @@ window.onload = function(){
   var ctx = c.getContext("2d");
   var width = c.width;
   var height = c.height*0.9;
-  var SHIFT = 2;
+  var SHIFT = 0.1;
   var MAX_DIST = Math.sqrt(Math.pow(width/2,2)+Math.pow(height/2,2));
   ctx.fillStyle="#000";
   ctx.fillRect(0,0,width,height);
@@ -13,13 +13,13 @@ window.onload = function(){
   pointArray = [];
 
   var point = function(){
-    this.x = width/2;
+    this.x = (width/2)-10+Math.random()*20;
     this.prevX = this.x;
-    this.y = height/2;
+    this.y = (height/2)-10+Math.random()*20;
     this.prevY = this.y;
     this.angle = Math.random()*2*Math.PI;
-    this.speed = SHIFT+Math.random()*16;
-    this.base = 3+Math.random()*6;
+    this.speed = SHIFT+Math.random()*2;
+    this.base = 8+Math.random()*8;
   };
 
   point.prototype.getDistance = function(){
@@ -63,7 +63,7 @@ window.onload = function(){
       this.prevY = this.y;
       this.x += Math.cos(this.angle)*this.speed;
       this.y += Math.sin(this.angle)*this.speed;
-      this.speed *= 1.04;
+      this.speed *= 1.025;
   };
 
   function addPoint(){
@@ -73,7 +73,7 @@ window.onload = function(){
 
   for(var i=0;i<200;i++){
     pointArray.push(new point());
-    for(var j=0;j<Math.random()*20;j++){pointArray[i].shift();}
+    for(var j=0;j<Math.random()*50;j++){pointArray[i].shift();}
     pointArray[i].draw();
   }
 
