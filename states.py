@@ -4,19 +4,34 @@
 words = [line.strip() for line in open("words.txt", "r")]
 #words = ['Hydrogen','Helium','Lithium','Beryllium','Boron','Carbon','Ntrogen','Oxygen','Fluorine','Neon','Sodium','Magnesium','Aluminum','Silicon','Phosphorus','Sulfur','Chlorine','Argon','Potassium','Calcium','Scandium','Titanium','Vanadium','Chromium','Manganese','Iron','Cobalt','Nickel','Copper','Zinc','Gallium','Germanium','Arsenic','Selenium','Bromine','Krypton','Rubidium','Strontium','Yttrium','Zirconium','Niobium','Molybdenum','Technetium','Ruthenium','Rhodium','Palladium','Silver','Cadmium','Indium','Tin','Antimony','Tellurium','Iodine','Xenon','Cesium','Barium','Lanthanum','Cerium','Praseodymium','Neodymium','Promethium','Samarium','Europium','Gadolinium','Terbium','Dysprosium','Holmium','Erbium','Thulium','Ytterbium','Lutetium','Hafnium','Tantalum','Tungsten','Rhenium','Osmium','Iridium','Platinum','Gold','Mercury','Thallium','Lead','Bismuth','Polonium','Astatine','Radon','Francium','Radium','Actinium','Thorium','Protactinium','Uranium','Neptunium','Plutonium','Americium','Curium','Berkelium','Californium','Einsteinium','Fermium','Mendelevium','Nobelium','Lawrencium','Rutherfordium','Dubnium','Seaborgium','Bohrium','Hassium','Meitnerium','Darmstadtium','Roentgenium','Copernicium','Flerovium','Livermorium']
 words = [i.lower() for i in words]
+words = [i for i in words if "'" not in i]
 states = words
-end = filter(None, [word + " " + filter(None, [state if all([i not in state for i in word]) else '' for state in states])[0] if len(filter(None, [state if all([i not in state for i in word]) else '' for state in states]))==1 else '' for word in words])
+#end = filter(None, [word + " " + filter(None, [state if all([i not in state for i in word]) else '' for state in states])[0] if len(list(filter(None, [state if all([i not in state for i in word]) else '' for state in states])))==1 else '' for word in words])
+end = []
+print(len(states))
+def getstates(word):
+    return list(filter(None, [state if all([i not in state for i in word]) else '' for state in states]))
+
+for index, word in enumerate(words):
+    if index%100==0:
+        print(index)
+    temp = []
+    for state in states:
+        for i in word:
+            if i in state:
+                break
+        else:
+            temp.append(state)
+    if len(temp)==1:
+        end.append(word + " " + temp[0])
 
 end = sorted(end, key=lambda i:len(i.split()[0]))
-print end[:100]
-print end[-100:]
+print(end)
+print(end[:100])
+print(end[-100:])
 
 '''answer = file("final.txt", "w") #UNCOMMENT TO SAVE
 for i in end:
     answer.write(i)
     answer.write("\n")'''
 
-def getstates(word):
-    return filter(None, [state if all([i not in state for i in word]) else '' for state in states])
-
-print getstates("north dakota")
