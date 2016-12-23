@@ -13,7 +13,7 @@ window.onload = function(){
   var ballArray = [];
   var startClickLocation, endClickLocation, tempEndLocation, tempPrevEndLocation;
   var FACTOR = 0.08;
-  var GRAVITY = 0.18; //Arbitrary number unrelated to 9.8 m/s^2
+  var GRAVITY = 0.2; //Arbitrary number unrelated to 9.8 m/s^2
   var RADIUS = 20;
   var REBOUND = -0.88;
   var MASS = 5;
@@ -53,7 +53,7 @@ window.onload = function(){
     this.velocityX = (this.x-endX)*FACTOR;
     this.velocityY = (this.y-endY)*FACTOR;
     this.isDone = true;
-    this.life=10000;
+    this.life=100000;
   }
 
   Ball.prototype.move = function(){
@@ -86,6 +86,7 @@ window.onload = function(){
     if(this.y+RADIUS>=height){
       this.y = height-RADIUS;
       this.velocityY *= REBOUND;
+      this.velocityX *= 0.97;
     }
     if(this.y-RADIUS<=0){
       this.y = RADIUS;
