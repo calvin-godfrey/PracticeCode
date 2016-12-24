@@ -14,7 +14,7 @@ window.onload = function(){
   var   RED = "#F00";
   var  CYAN = "#4AF";
   var SUNSET = ["#49F", "#48F", "#47F", "#46F", "#45F", "#44F"];
-  for(var i=45;i<75;i++){
+  for(var i=45;i<75;i+=5){
     SUNSET.push("#" + i + "44FF");
   }
   SUNSET.push("#7330DD", "#682DC6", "#632FB7", "#5E2DAD", "#55299B", "#4A2487", "#421F7A", "#3C1C70", "#361963", "#2f1659", "#2b1451", "#210f3f", "#1c0c35", "#170a2b");
