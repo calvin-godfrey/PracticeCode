@@ -19,6 +19,7 @@ window.onload = function(){
     this.length = 300;
     this.toX = this.x + this.length*Math.cos(this.angle);
     this.toY = this.y + this.length*Math.sin(this.angle);
+    this.isUpdated = true;
   }
 
   Base.prototype.draw = function(){
@@ -39,34 +40,31 @@ window.onload = function(){
     if(this.side==0)this.angle = Math.PI-this.angle;
     this.toX = this.x+this.length*Math.cos(this.angle);
     this.toY = this.y+this.length*Math.sin(this.angle);
+    this.isUpdated = false;
   };
 
   Branch.prototype.draw = function(){
     if(this.angle==ANGLE && this.side==1){
-      return true;
+      return;
     }
     else if(this.angle==Math.PI-ANGLE && this.side==0){
-      return true;
+      return;
     }
     else{
-      draw(this, "#FFF", 3);
-      if(this.side==1){
-        this.angle = this.parent.angle + ANGLE;
-      }
-      else{
-        this.angle = this.parent.angle - ANGLE;
-      }
+      this.isUpdated = false;
+      this.angle = this.side ? this.parent.angle+ANGLE : this.parent.angle - ANGLE;
       this.updateTo();
       draw(this, "#000", 1);
     }
   }
 
   Branch.prototype.updateTo = function(){
-    this.parent.updateTo();
+    if(!this.parent.isUpdated)this.parent.updateTo();
     this.y = this.parent.toY;
     this.x = this.parent.toX;
     this.toX = this.x+this.length*Math.cos(this.angle);
     this.toY = this.y+this.length*Math.sin(this.angle);
+    this.isUpdated = true;
   }
 
   function draw(branch, color, width){
@@ -94,7 +92,7 @@ window.onload = function(){
       isParent[i] = true;
     }
   }
-  for(var i=0;i<8191;i++){
+  for(var i=0;i<16383;i++){
     var len = branchArray.length;
     for(var j=0;j<len;j++){
       addToArray(j);
@@ -102,6 +100,8 @@ window.onload = function(){
   }
 
   var keepDraw = setInterval(function(){
+    ctx.fillStyle = "#FFF";
+    ctx.fillRect(0,0,width,height);
     for(var i=0;i<branchArray.length;i++){
       branchArray[i].draw();
     }

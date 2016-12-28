@@ -4,6 +4,14 @@ window.onload = function(){
   s.src="sun.png";
   var m = new Image();
   m.src="moon.png";
+  var c1 = new Image();
+  c1.src = "cloud1.png";
+  var c2 = new Image();
+  c2.src = "cloud2.png";
+  var c3 = new Image();
+  c3.src = "cloud3.png";
+  var c4 = new Image();
+  c4.src = "cloud4.png";
   canvas.width = screen.width;
   canvas.height = screen.height;
   var width = canvas.width;
@@ -14,6 +22,7 @@ window.onload = function(){
   var   RED = "#F00";
   var  CYAN = "#4AF";
   var SUNSET = ["#49F", "#48F", "#47F", "#46F", "#45F", "#44F"];
+  var sunIndex = 0;
   for(var i=45;i<75;i+=5){
     SUNSET.push("#" + i + "44FF");
   }
@@ -21,7 +30,7 @@ window.onload = function(){
 
   SUNSET.push("#000");
   var FRAMES = SUNSET.length;
-  var STEP = height*0.5/FRAMES;
+  var STEP = height*0.7/FRAMES;
 
   var Planet = function(image, angle){ //Yes I know neither of them are planets
     this.angle = angle;
@@ -37,19 +46,37 @@ window.onload = function(){
 
   Planet.prototype.draw = function(){
     if(this.y < height*1.1)ctx.drawImage(this.image, this.x-(this.width/2), this.y-(this.height/2), this.width, this.height);
+    this.shift();
   }
 
   Planet.prototype.shift = function(){
-    this.angle += Math.PI/128;
+    this.angle += Math.PI/1024;
     this.x = this.xCenter+this.radius*Math.cos(this.angle);
     this.y = this.yCenter+this.radius*Math.sin(this.angle);
   }
 
+  var Cloud = function(image){
+    this.x = 0;
+    this.image = image;
+    this.y = Math.random()*height/4;
+    this.width = this.image.naturalWidth/4;
+    this.height = this.image.naturalHeight/4;
+  }
+
+  Cloud.prototype.draw = function(){
+    ctx.drawImage(this.image, this.x-(this.width/2), this.y-(this.height/2), this.width, this.height);
+    this.x += 4;
+  }
+
+  var cloudImages = [c1,c2,c3,c4];
+  var clouds = [];
+
   function drawBackground(sky){
     ctx.fillStyle = sky;
     ctx.fillRect(0,0,width,height);
+    ctx.beginPath();
     ctx.strokeStyle = GREEN;
-    ctx.arc(width/2, height*5, width*2.05, 0, Math.PI*2);
+    ctx.arc(width/2, height*4.5, height*3.7, 0, Math.PI*2);
     ctx.stroke();
     ctx.fillStyle = GREEN;
     ctx.fill();
@@ -61,15 +88,23 @@ window.onload = function(){
   function animate(){
     var color = CYAN;
     for(var i=0;i<FRAMES;i++){
-      if(sun.y > height*0.75 + (STEP*i))color = SUNSET[i];
+      if(sun.y > height*0.6 + (STEP*i)){
+        color = SUNSET[i];
+      }
     }
     drawBackground(color);
     for(var i=0;i<planets.length;i++){
       planets[i].draw();
-      planets[i].shift();
     }
-    requestAnimationFrame(animate);
+    if(Math.random()<0.01){
+      clouds.push(new Cloud(cloudImages[Math.floor(Math.random()*4)]));
+    }
+    for(var i=0;i<clouds.length;i++){
+      clouds[i].draw();
+      if(clouds[i].x>width+clouds[i].width+10)clouds.splice(i,1);
+    }
+    window.requestAnimationFrame(animate);
   }
-  requestAnimationFrame(animate);
+  window.requestAnimationFrame(animate);
 
 };
