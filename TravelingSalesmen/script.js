@@ -3,6 +3,8 @@ window.onload = function(){
   var points = document.getElementById("getPoints");
   var minDistance = 1e20;
   var bestWay = [];
+  var allArray;
+  var iter = 0;
   canvas.width = screen.width;
   canvas.height = screen.height;
   var ctx = canvas.getContext('2d');
@@ -23,11 +25,11 @@ window.onload = function(){
     ctx.fill();
   };
 
-  Point.prototype.line = function(other){
+  Point.prototype.line = function(other, color, thick){
     ctx.beginPath();
     ctx.moveTo(this.x, this.y);
-    ctx.strokeStyle = "#ddd";
-    ctx.strokeWidth = 4;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thick;
     ctx.lineTo(other.x, other.y);
     ctx.stroke();
   }
@@ -56,19 +58,59 @@ window.onload = function(){
     return ans;
   };
 
-  function drawLines(){
-    for(var i=1;i<bestWay.length;i++){
-      bestWay[i].line(bestWay[i-1]);
-    }
+  function drawLines(array, color, thick){
+    for(var i=1;i<array.length;i++){
+      array[i].line(array[i-1], color, thick);
+    };
+  };
+
+  var usedChars = [];
+  var permArr = [];
+  function permute(input) {
+    var i, ch;
+    for (i = 0; i < input.length; i++) {
+      ch = input.splice(i, 1)[0];
+      usedChars.push(ch);
+      if (input.length == 0) {
+        permArr.push(usedChars.slice());
+      }
+      permute(input);
+      input.splice(i, 0, ch);
+      usedChars.pop();
   }
+  return permArr;
+};
+
+  function copy(array){
+    var ans = [];
+    for(var i=0;i<array.length;i++){
+      ans.push(array[i]);
+    };
+    return ans;
+  };
 
   var pointList = [];
-
+  var text = document.getElementById("percent");
   function animate(){
     drawBackground();
-    drawLines();
-    //Do math here
-    requestAnimationFrame(animate);
+    drawLines(bestWay, "#ddd", 7);
+    text.innerHTML = iter + "/" + allArray.length;
+    pointList = allArray[iter];
+    if(iter<allArray.length-1)drawLines(pointList, "#f00", 3);
+    var dist = calcDistance();
+    if(dist<minDistance){
+      minDistance = dist;
+      bestWay = copy(pointList);
+    };
+    if(iter<allArray.length-1)iter++;
+  };
+
+  function main(){
+    drawBackground();
+    drawLines(bestWay, "#ddd",7);
+    var loop = setInterval(function(){
+      animate();
+    }, .1);
   }
 
   points.addEventListener('mousedown', function(event){
@@ -76,6 +118,7 @@ window.onload = function(){
       pointList.push(new Point());
       bestWay.push(pointList[i]);
     };
-    requestAnimationFrame(animate);
+    allArray = permute(pointList);
+    main();
     });
   };
