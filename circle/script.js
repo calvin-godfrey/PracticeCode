@@ -62,10 +62,10 @@ window.onload = function(){
   function drawBackground(){
     ctx.fillStyle = "#FFF";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.beginPath();
+    /*ctx.beginPath();
     ctx.arc(X_CENTER, Y_CENTER, RADIUS, 0, Math.PI*2);
     ctx.strokeStyle = "#000";
-    ctx.stroke();
+    ctx.stroke();*/
     if(drawTracks){
     for(var i=0;i<points.length;i++){
         var j = i*Math.PI/points.length;
@@ -89,7 +89,7 @@ window.onload = function(){
       ctx.translate(X_CENTER, Y_CENTER);
       ctx.rotate(points[Math.floor(points.length/2)+i].angle);
       ctx.lineWidth = 1;
-      ctx.strokeStyle = "#F00";
+      ctx.strokeStyle = getColor(Math.abs(points[i].x-points[Math.floor(points.length/2)+1].x));
       ctx.lineTo(points[Math.floor(points.length/2)+i].x, 0);
       ctx.stroke();
       ctx.restore();
@@ -124,6 +124,19 @@ window.onload = function(){
     if(!doloop)loop();
   }
 
+  function getColor(n){ //Returns color of line given its distance
+    if(n>300)var red=0;
+    else{var red = 256-n*256/300;}
+    red = red.toString(16).slice(0,2);
+    if(red=="0")red = "00";
+    if(n<300)var blue = 0;
+    else{var blue = (n-100)*256/300;}
+    blue = blue.toString(16).slice(0,2);
+    if(blue=="0")blue = "00";
+    var ans = "#"+red+"00"+blue;
+    return ans;
+  }
+
   document.getElementById("start").addEventListener("mousedown", function(event){
     stop();
     restart = true;
@@ -149,6 +162,10 @@ window.onload = function(){
   var t = setInterval(function(){
     if(document.getElementById("track").checked)drawTracks = true;
     else{drawTracks = false;}
+  }, 500);
+
+  var m = setInterval(function(){
+    document.getElementById("dispMagic").innerHTML = document.getElementById("magic").value;
   }, 500);
 
   document.getElementById("stop").addEventListener("mousedown", function(event){
