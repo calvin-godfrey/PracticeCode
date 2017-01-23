@@ -5,6 +5,10 @@
   <script src="script.js"></script>
 </head>
 <body>
+  <input id="points" type="range" min="4" max="512">Points</input><button id="start">Start</button><button id="stop">Stop</button><input type="checkbox" id="lines">Show lines?</input><input type="checkbox" id="track">Tracks?</input>
+  <br>
+  <input id="magic" type="range" min="1" max="2000">Magic</input>
+  <p>Points: <span id="selected"></span></p>
   <canvas id="canvas" style="width:100%;height:100%"></canvas>
 </body>
 </html>
