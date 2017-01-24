@@ -122,13 +122,14 @@ window.onload = function(){
   }
 
   function getColor(n){ //Returns color of line given its distance
+    console.log(n);
     if(n<100)return "#F00";
     if(n>300)return "#00F";
-    if(n>200)var red=0;
-    else{var red = ((n-100)/200)*256;}
+    if(n>225)var red=0;
+    else{var red = Math.min(256, ((n-100)/200)*256);}
     red = red.toString(16).slice(0,2);
     if(red=="0")red = "00";
-    if(n<200)var blue = 0;
+    if(n<175)var blue = 0;
     else{var blue = ((n-100)/200)*256;}
     blue = blue.toString(16).slice(0,2);
     if(blue=="0")blue = "00";
