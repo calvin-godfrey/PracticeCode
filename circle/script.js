@@ -122,17 +122,18 @@ window.onload = function(){
   }
 
   function getColor(n){ //Returns color of line given its distance
-    console.log(n);
     if(n<100)return "#F00";
     if(n>300)return "#00F";
     if(n>225)var red=0;
-    else{var red = Math.min(256, ((n-100)/200)*256);}
-    red = red.toString(16).slice(0,2);
-    if(red=="0")red = "00";
+    else{var red = Math.min(256, 256-((n-100)/200)*256);}
+    red = red.toString(16);
+    if(red!="0")red = red.slice(0, red.indexOf("."));
+    if(red.length==1)red = "0"+red;
     if(n<175)var blue = 0;
     else{var blue = ((n-100)/200)*256;}
-    blue = blue.toString(16).slice(0,2);
-    if(blue=="0")blue = "00";
+    blue = blue.toString(16);
+    if(blue!="0")blue = blue.slice(0, blue.indexOf("."));
+    if(blue.length==1)blue = "0"+blue;
     var ans = "#"+red+"00"+blue;
     return ans;
   }
