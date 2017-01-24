@@ -8,7 +8,7 @@ window.onload = function(){
   var INNER_RADIUS = RADIUS/2;
   var ctx = canvas.getContext("2d");
   ctx.translate(0.5,0.5);
-  window.requestAnimFrame = (function() {
+  window.requestAnimFrame = (function() { //Dunno if this is right but it works so I'm not removing it
     var lastTime = 0;
     var vendors = ['ms', 'moz', 'webkit', 'o'];
     for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
@@ -41,17 +41,19 @@ window.onload = function(){
   }
 
   Point.prototype.calcPoint = function(){
-    this.x = 200*Math.cos(this.life);
-    this.y = 0;
-    this.life = this.life + Math.PI/72;
+    var tempx = (200-radius)*Math.cos(this.life)+radius*Math.cos(((200-radius)/radius)*this.life);
+    var tempy = (200-radius)*Math.sin(this.life)-radius*Math.sin(((200-radius)/radius)*this.life);
+    //var distance = Math.pow(Math.pow(tempx, 2)+Math.pow(tempy, 2), 0.5);
+    this.x = tempx*Math.cos(this.angle)-tempy*Math.sin(this.angle); //Rotate the point
+    this.y = tempy*Math.cos(this.angle)+tempx*Math.sin(this.angle);
+    this.life = this.life + Math.PI/128;
   }
 
   Point.prototype.draw = function(){
     ctx.save();
     ctx.translate(X_CENTER, Y_CENTER);
-    ctx.rotate(this.angle);
     ctx.beginPath();
-    ctx.arc(this.x, this.y,2, 0, Math.PI*2);
+    ctx.arc(this.x, this.y, 2, 0, Math.PI*2);
     ctx.strokeStyle = "#000";
     ctx.stroke();
     ctx.fillStyle = "#000";
@@ -70,6 +72,7 @@ window.onload = function(){
     for(var i=0;i<points.length;i++){
         var j = i*Math.PI/points.length;
         ctx.beginPath();
+        ctx.lineWidth = 1;
         ctx.moveTo(X_CENTER+200*Math.cos(j), Y_CENTER+200*Math.sin(j));
         ctx.lineTo(X_CENTER-200*Math.cos(j), Y_CENTER-200*Math.sin(j));
         ctx.stroke();
@@ -79,18 +82,14 @@ window.onload = function(){
 
   function drawLine(){
     for(var i=0;i<Math.floor(points.length/2);i++){
+      var other = Math.floor(points.length/2)+i
       ctx.save();
       ctx.translate(X_CENTER, Y_CENTER);
-      ctx.rotate(points[i].angle);
       ctx.beginPath();
       ctx.moveTo(points[i].x, points[i].y);
-      ctx.restore();
-      ctx.save();
-      ctx.translate(X_CENTER, Y_CENTER);
-      ctx.rotate(points[Math.floor(points.length/2)+i].angle);
       ctx.lineWidth = 1;
-      ctx.strokeStyle = getColor(Math.abs(points[i].x-points[Math.floor(points.length/2)+1].x));
-      ctx.lineTo(points[Math.floor(points.length/2)+i].x, 0);
+      ctx.strokeStyle = getColor(Math.pow(Math.pow(points[i].x-points[other].x, 2)+Math.pow(points[i].y-points[other].y, 2), 0.5));
+      ctx.lineTo(points[other].x, points[other].y);
       ctx.stroke();
       ctx.restore();
     }
@@ -102,6 +101,7 @@ window.onload = function(){
   var restart = false;
   var stopped = false;
   var doloop = undefined;
+  var radius = 100;
   function loop(){
     drawBackground();
     for(var i=0;i<points.length;i++){
@@ -125,14 +125,18 @@ window.onload = function(){
   }
 
   function getColor(n){ //Returns color of line given its distance
-    if(n>300)var red=0;
-    else{var red = 256-n*256/300;}
-    red = red.toString(16).slice(0,2);
-    if(red=="0")red = "00";
-    if(n<300)var blue = 0;
-    else{var blue = (n-100)*256/300;}
-    blue = blue.toString(16).slice(0,2);
-    if(blue=="0")blue = "00";
+    if(n<100)return "#F00";
+    if(n>300)return "#00F";
+    if(n>225)var red=0;
+    else{var red = Math.min(256, 256-((n-100)/200)*256);}
+    red = red.toString(16);
+    if(red!="0")red = red.slice(0, red.indexOf("."));
+    if(red.length==1)red = "0"+red;
+    if(n<175)var blue = 0;
+    else{var blue = ((n-100)/200)*256;}
+    blue = blue.toString(16);
+    if(blue!="0")blue = blue.slice(0, blue.indexOf("."));
+    if(blue.length==1)blue = "0"+blue;
     var ans = "#"+red+"00"+blue;
     return ans;
   }
@@ -142,6 +146,7 @@ window.onload = function(){
     restart = true;
     var numPoints = document.getElementById("points").value;
     var magic = document.getElementById("magic").value;
+    radius = document.getElementById("radius").value;
     points = [];
     for(var i=0;i<numPoints;i++){
       points.push(new Point(X_CENTER, Y_CENTER, i*Math.PI/numPoints, i*magic/numPoints)); //Legit last one is a magic number. Now clue why it is what it is
@@ -166,6 +171,10 @@ window.onload = function(){
 
   var m = setInterval(function(){
     document.getElementById("dispMagic").innerHTML = document.getElementById("magic").value;
+  }, 500);
+
+  var r = setInterval(function(){
+    document.getElementById("dispRadius").innerHTML = document.getElementById("radius").value;
   }, 500);
 
   document.getElementById("stop").addEventListener("mousedown", function(event){
