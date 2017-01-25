@@ -64,7 +64,6 @@ window.onload = function(){
   function drawBackground(){
     ctx.fillStyle = "#FFF";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    console.log(outerPoints.length);
     for(var i=0;i<outerPoints.length;i++){
       ctx.save();
       ctx.translate(X_CENTER, Y_CENTER);
@@ -152,15 +151,15 @@ window.onload = function(){
   }
 
   function getColor(n){ //Returns color of line given its distance
-    if(n<100)return "#F00";
-    if(n>300)return "#00F";
-    if(n>225)var red=0;
-    var red = Math.min(256, 256-((n-100)/200)*256);
+    if(n<(RADIUS-radius)*0.25)return "#F00";
+    if(n>(RADIUS-radius)*0.75)return "#00F";
+    if(n>(RADIUS-radius)*0.55)var red=0;
+    var red = Math.min(256, 256-((n-(RADIUS-radius)*0.25)/((RADIUS-radius)*0.5))*256);
     red = red.toString(16);
     if(red!="0")red = red.slice(0, red.indexOf("."));
     if(red.length==1)red = "0"+red;
-    if(n<175)var blue = 0;
-    var blue = ((n-100)/200)*256;
+    if(n<(RADIUS-radius)*0.45)var blue = 0;
+    var blue = ((n-(RADIUS-radius)*0.25)/((RADIUS-radius)*0.5))*256;
     blue = blue.toString(16);
     if(blue!="0")blue = blue.slice(0, blue.indexOf("."));
     if(blue.length==1)blue = "0"+blue;
