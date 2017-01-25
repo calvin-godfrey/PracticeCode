@@ -72,6 +72,7 @@ window.onload = function(){
       ctx.stroke();
       ctx.restore();
     }
+    if(!document.getElementById("ellipse").checked)outerPoints = [];
   }
 
   function drawLine(){
