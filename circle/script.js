@@ -205,8 +205,24 @@ window.onload = function(){
   document.getElementById("stop").addEventListener("mousedown", function(event){
     ctx.fillStyle="#fff";
     ctx.fillRect(0,0,canvas.width,canvas.height);
+    outerPoints = [];
     stop();
     restart = true;
+  });
+
+  document.getElementById("random").addEventListener("mousedown", function(event){
+    var vA = document.getElementById("magic");
+    var vB = document.getElementById("points");
+    var vC = document.getElementById("Rradius");
+    var vD = document.getElementById("radius");
+    var vE = document.getElementById("mult");
+    vA.value = Math.random()*1999;
+    vB.value = Math.random()*508;
+    vC.value = 150 + Math.random()*450;
+    vD.value = Math.random()*150;
+    vE.value = 1 + Math.random();
+
+
   });
 
 }
