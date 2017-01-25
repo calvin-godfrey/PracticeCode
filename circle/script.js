@@ -64,44 +64,71 @@ window.onload = function(){
   function drawBackground(){
     ctx.fillStyle = "#FFF";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    /*ctx.beginPath();
-    ctx.arc(X_CENTER, Y_CENTER, RADIUS, 0, Math.PI*2);
-    ctx.strokeStyle = "#000";
-    ctx.stroke();*/
-    if(drawTracks){
-    for(var i=0;i<points.length;i++){
-        var j = i*Math.PI/points.length;
-        ctx.beginPath();
-        ctx.lineWidth = 1;
-        ctx.moveTo(X_CENTER+200*Math.cos(j), Y_CENTER+200*Math.sin(j));
-        ctx.lineTo(X_CENTER-200*Math.cos(j), Y_CENTER-200*Math.sin(j));
-        ctx.stroke();
-      }
+    console.log(outerPoints.length);
+    for(var i=0;i<outerPoints.length;i++){
+      ctx.save();
+      ctx.translate(X_CENTER, Y_CENTER);
+      ctx.beginPath();
+      ctx.arc(outerPoints[i][0], outerPoints[i][1], 1, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.restore();
     }
   }
 
   function drawLine(){
-    for(var i=0;i<Math.floor(points.length/2);i++){
-      var other = Math.floor(points.length/2)+i
+    if(!numLines){
+      for(var i=0;i<Math.floor(points.length/2);i++){
+        var other = Math.floor(points.length/2)+i;
+        ctx.save();
+        ctx.translate(X_CENTER, Y_CENTER);
+        ctx.beginPath();
+        ctx.moveTo(points[i].x, points[i].y);
+        var dx = points[i].x-points[other].x;
+        var dy = points[i].y-points[other].y;
+        var distance = Math.pow(Math.pow(dx, 2)+Math.pow(dy, 2), 0.5);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = getColor(distance);
+        if(useMult){
+          ctx.lineTo(points[i].x-dx*mult, points[i].y-dy*mult);
+          if(showEllipse)outerPoints.push([points[i].x-dx*mult, points[i].y-dy*mult]);
+          //if(outerPoints.length==128*points.length)outerPoints = [];
+        }
+        else{ctx.lineTo(points[i].x-dx, points[i].y-dy);}
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+    else{
+      var other = Math.floor(points.length/2);
       ctx.save();
       ctx.translate(X_CENTER, Y_CENTER);
       ctx.beginPath();
-      ctx.moveTo(points[i].x, points[i].y);
+      ctx.moveTo(points[0].x, points[0].y);
+      var dx = points[0].x-points[other].x;
+      var dy = points[0].y-points[other].y;
+      var slope = dy/dx;
+      var distance = Math.pow(Math.pow(dx, 2)+Math.pow(dy, 2), 0.5);
       ctx.lineWidth = 1;
-      ctx.strokeStyle = getColor(Math.pow(Math.pow(points[i].x-points[other].x, 2)+Math.pow(points[i].y-points[other].y, 2), 0.5));
-      ctx.lineTo(points[other].x, points[other].y);
+      ctx.strokeStyle = getColor(distance);
+      ctx.lineTo(points[0].x-dx*mult, points[0].y-dy*mult);
+      if(showEllipse)outerPoints.push([points[0].x-dx*mult, points[0].y-dy*mult]);
+      if(outerPoints.length==256)outerPoints = []; //Means we have made a full revolution
       ctx.stroke();
       ctx.restore();
     }
   }
 
   var points;
+  var outerPoints = [];
   var drawLines = false;
-  var drawTracks = false;
   var restart = false;
   var stopped = false;
   var doloop = undefined;
   var radius = 100;
+  var numsLines = false;
+  var mult = 1;
+  var useMult = false;
+  var showEllipse = false;
   function loop(){
     drawBackground();
     for(var i=0;i<points.length;i++){
@@ -127,12 +154,12 @@ window.onload = function(){
   function getColor(n){ //Returns color of line given its distance
     if(n<100)return "#F00";
     if(n>300)return "#00F";
-    //if(n>225)var red=0;
+    if(n>225)var red=0;
     var red = Math.min(256, 256-((n-100)/200)*256);
     red = red.toString(16);
     if(red!="0")red = red.slice(0, red.indexOf("."));
     if(red.length==1)red = "0"+red;
-    //if(n<175)var blue = 0;
+    if(n<175)var blue = 0;
     var blue = ((n-100)/200)*256;
     blue = blue.toString(16);
     if(blue!="0")blue = blue.slice(0, blue.indexOf("."));
@@ -144,11 +171,14 @@ window.onload = function(){
   document.getElementById("start").addEventListener("mousedown", function(event){
     stop();
     restart = true;
+    ctx.fillStyle = "#FFF"; //Reset screen;
+    ctx.fillRect(0,0,canvas.width,canvas.height);
     var numPoints = document.getElementById("points").value;
-    //var magic = document.getElementById("magic").value;
-    var magic = Math.PI;
+    if(document.getElementById("set").checked)var magic = Math.PI;
+    else{var magic = document.getElementById("magic").value;}
     radius = document.getElementById("radius").value;
     RADIUS = document.getElementById("Rradius").value;
+    mult = document.getElementById("mult").value;
     points = [];
     for(var i=0;i<numPoints;i++){
       points.push(new Point(X_CENTER, Y_CENTER, i*Math.PI/numPoints, i*magic/numPoints)); //Legit last one is a magic number. Now clue why it is what it is
@@ -161,29 +191,20 @@ window.onload = function(){
     document.getElementById("selected").innerHTML = document.getElementById("points").value;
   }, 500);
 
-  var l = setInterval(function(){
-    if(document.getElementById("lines").checked)drawLines = true;
-    else{drawLines = false;}
-  }, 500);
-
   var t = setInterval(function(){
-    if(document.getElementById("track").checked)drawTracks = true;
-    else{drawTracks = false;}
-  }, 500);
-
-  var m = setInterval(function(){
+    drawLines = document.getElementById("lines").checked;
     document.getElementById("dispMagic").innerHTML = document.getElementById("magic").value;
-  }, 500);
-
-  var r = setInterval(function(){
     document.getElementById("dispRadius").innerHTML = document.getElementById("radius").value;
-  }, 500);
-
-  var rr = setInterval(function(){
     document.getElementById("dispRRadius").innerHTML = document.getElementById("Rradius").value;
+    document.getElementById("multiplier").innerHTML = document.getElementById("mult").value;
+    useMult = document.getElementById("useMult").checked;
+    numLines = document.getElementById("nums").checked;
+    showEllipse = document.getElementById("ellipse").checked;
   }, 500);
 
   document.getElementById("stop").addEventListener("mousedown", function(event){
+    ctx.fillStyle="#fff";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
     stop();
     restart = true;
   });
