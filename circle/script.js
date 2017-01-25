@@ -41,8 +41,8 @@ window.onload = function(){
   }
 
   Point.prototype.calcPoint = function(){
-    var tempx = (200-radius)*Math.cos(this.life)+radius*Math.cos(((200-radius)/radius)*this.life);
-    var tempy = (200-radius)*Math.sin(this.life)-radius*Math.sin(((200-radius)/radius)*this.life);
+    var tempx = (RADIUS-radius)*Math.cos(this.life)+radius*Math.cos(((RADIUS-radius)/radius)*this.life);
+    var tempy = (RADIUS-radius)*Math.sin(this.life)-radius*Math.sin(((RADIUS-radius)/radius)*this.life);
     //var distance = Math.pow(Math.pow(tempx, 2)+Math.pow(tempy, 2), 0.5);
     this.x = tempx*Math.cos(this.angle)-tempy*Math.sin(this.angle); //Rotate the point
     this.y = tempy*Math.cos(this.angle)+tempx*Math.sin(this.angle);
@@ -127,13 +127,13 @@ window.onload = function(){
   function getColor(n){ //Returns color of line given its distance
     if(n<100)return "#F00";
     if(n>300)return "#00F";
-    if(n>225)var red=0;
-    else{var red = Math.min(256, 256-((n-100)/200)*256);}
+    //if(n>225)var red=0;
+    var red = Math.min(256, 256-((n-100)/200)*256);
     red = red.toString(16);
     if(red!="0")red = red.slice(0, red.indexOf("."));
     if(red.length==1)red = "0"+red;
-    if(n<175)var blue = 0;
-    else{var blue = ((n-100)/200)*256;}
+    //if(n<175)var blue = 0;
+    var blue = ((n-100)/200)*256;
     blue = blue.toString(16);
     if(blue!="0")blue = blue.slice(0, blue.indexOf("."));
     if(blue.length==1)blue = "0"+blue;
@@ -145,8 +145,10 @@ window.onload = function(){
     stop();
     restart = true;
     var numPoints = document.getElementById("points").value;
-    var magic = document.getElementById("magic").value;
+    //var magic = document.getElementById("magic").value;
+    var magic = Math.PI;
     radius = document.getElementById("radius").value;
+    RADIUS = document.getElementById("Rradius").value;
     points = [];
     for(var i=0;i<numPoints;i++){
       points.push(new Point(X_CENTER, Y_CENTER, i*Math.PI/numPoints, i*magic/numPoints)); //Legit last one is a magic number. Now clue why it is what it is
@@ -175,6 +177,10 @@ window.onload = function(){
 
   var r = setInterval(function(){
     document.getElementById("dispRadius").innerHTML = document.getElementById("radius").value;
+  }, 500);
+
+  var rr = setInterval(function(){
+    document.getElementById("dispRRadius").innerHTML = document.getElementById("Rradius").value;
   }, 500);
 
   document.getElementById("stop").addEventListener("mousedown", function(event){
