@@ -1,7 +1,6 @@
 window.onload = function(){
   var canvas = document.getElementById("canvas");
   var points_element = document.getElementById("getPoints");
-  var ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   var points = [];
   var lines = [];
   var temp_line = [];
@@ -16,7 +15,7 @@ window.onload = function(){
   canvas.width = screen.width;
   canvas.height = screen.height;
   var ctx = canvas.getContext('2d');
-  ctx.font = "20px Arial";
+  ctx.font = "16px Arial";
   var start_click = null;
 
   Point = function(x, y, id){
@@ -27,7 +26,7 @@ window.onload = function(){
     this.lines = [];
     this.line_length = [];
     this.path_from = "N/A";
-    this.letter = ALPHABET.charAt(id);
+    this.letter = (id+1).toString();
     this.value = 0;
     this.is_done = false;
     this.is_active = false;
@@ -49,7 +48,7 @@ window.onload = function(){
     ctx.fillStyle = this.color;
     ctx.fill();
     ctx.fillStyle = "#000";
-    ctx.fillText(this.letter, this.x-this.radius/1.8, this.y+this.radius/1.8);
+    ctx.fillText(this.letter, this.x-this.radius/1.3, this.y+this.radius/1.8);
   };
 
   Point.prototype.setType = function(which){ //0 normal, 1 start, 2 end
@@ -171,7 +170,7 @@ window.onload = function(){
     for(var i=0;i<priority_queue.length;i++){
       if(priority_queue[i].letter==start_point.letter){
         priority_queue.splice(i,1);
-        start_point.isDone = true;
+        start_point.is_done = true;
         break;
       }
     }
