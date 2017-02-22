@@ -218,7 +218,7 @@ window.onload = function(){
     var vE = document.getElementById("mult");
     vA.value = Math.random()*1999;
     vB.value = Math.random()*508;
-    vC.value = 150 + Math.random()*450;
+    vC.value = 150 + Math.random()*350;
     vD.value = Math.random()*150;
     vE.value = 1 + Math.random();
 
