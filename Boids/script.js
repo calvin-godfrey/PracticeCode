@@ -11,6 +11,7 @@ window.onload = function(){
     this.x = x;
     this.y = y;
     this.angle = a*Math.PI/180;
+    console.log(this.angle);
     this.velocity = v;
     this.velocityX = v*Math.cos(this.angle);
     this.velocityY = v*Math.sin(this.angle);
@@ -35,11 +36,24 @@ window.onload = function(){
   Boid.prototype.step = function(){
     this.x += this.velocityX;
     this.y += this.velocityY;
+    this.checkLocation();
+  }
+
+  Boid.prototype.checkLocation = function(){
+    if(this.x<0)this.x=width;
+    if(this.x>width)this.x=0;
+    if(this.y<0)this.y=height;
+    if(this.y>height)this.y=0;
+    if(this.velocity>5){
+      this.velocityY = (this.velocity/5)*Math.sin(this.angle);
+      this.velocityX = (this.velocity/5)*Math.cos(this.angle);
+      this.velocity = 5;
+    }
   }
 
   Boid.prototype.update = function(){
     this.velocity = Math.pow(Math.pow(this.velocityX, 2)+Math.pow(this.velocityY, 2), 0.5);
-    this.angle = Math.asin(this.velocityY/this.velocity);
+    this.angle = -Math.atan2(this.velocityX, this.velocityY)+Math.PI/2;
   }
 
   Boid.prototype.getDistance = function(other){
@@ -53,10 +67,10 @@ window.onload = function(){
       if(arr[i].id==this.id)continue;
       var distance = this.getDistance(arr[i]);
       if(distance<this.radius){
-        var deltaX = (arr[i].x-this.x);
-        var deltaY = (arr[i].y-this.y);
+        var deltaX = (this.x-arr[i].x);
+        var deltaY = (this.y-arr[i].y);
         var angle = Math.atan2(deltaX, deltaY);
-        var force = 50/(Math.pow(distance, 2)); //Based off force of gravity, numberator is some constant
+        var force = 30/distance;
         addX += force*Math.cos(angle);
         addY += force*Math.sin(angle);
       }
@@ -67,7 +81,7 @@ window.onload = function(){
   }
 
   function drawBackground(){
-    ctx.fillStyle = "#F00";
+    ctx.fillStyle = "#FFF";
     ctx.fillRect(0,0,canvas.width,canvas.height);
   }
 
@@ -75,6 +89,8 @@ window.onload = function(){
   for(var i=0;i<50;i++){
     arr.push(new Boid(Math.random()*width, Math.random()*height, Math.random()*360, Math.random()*2, i));
   }
+  //arr.push(new Boid(0,height/2, 0, 5, 0));
+  //arr.push(new Boid(width, height/2, 180, 5, 1));
 
   function main(){
     drawBackground();
