@@ -47,11 +47,10 @@ window.onload = function(){
   }
 
   Boid.prototype.checkLocation = function(){
-    //if(this.x==0&&this.y==0)console.log(this.id);
-    //if(this.x<0)this.x=width;
-    //if(this.x>width)this.x=0;
-    //if(this.y<0)this.y=height;
-    //if(this.y>height)this.y=0;
+    if(this.x<0||this.x>width||this.y<0||this.y>height){
+      this.x = Math.random()*width;
+      this.y = Math.random()*height;
+    }
     if(this.velocity.magnitude()>this.maxSpeed){
       this.velocity = new Vector(this.velocity.magnitude()/this.maxSpeed*Math.cos(this.angle), this.velocity.magnitude()/this.maxSpeed*Math.sin(this.angle));
     }
@@ -82,6 +81,25 @@ window.onload = function(){
     //this.angle = -Math.atan2(this.velocity.x, this.velocity.y)+Math.PI/2;
   }
 
+  Boid.prototype.alignment = function(){
+    var avgX = 0;
+    var avgY = 0;
+    var count = 0;
+    for(var i=0;i<arr.length;i++){
+      if(arr[i].id==this.id)continue;
+      if(this.getDistance(arr[i])<this.radius){
+        avgX += arr[i].velocity.x;
+        avgY += arr[i].velocity.y;
+        count++;
+      }
+    }
+    avgX /= count;
+    avgY /= count;
+    //return mult(new Vector(avgX, avgY), 0.05);
+    //this.velocity = add(this.velocity, mult(new Vector(avgX, avgY), 0.1));
+    //this.angle = -Math.atan2(this.velocity.x, this.velocity.y)+Math.PI/2;
+  }
+
   Boid.prototype.cohesion = function(){
     var posX = 0;
     var posY = 0;
@@ -102,7 +120,7 @@ window.onload = function(){
   Boid.prototype.seek = function(target){
     var posVector = new Vector(this.x, this.y);
     var des = mult(normalize(subtract(posVector, target)), this.maxSpeed);
-    return mult(des, -0.03);
+    return mult(des, -0.02);
     //this.velocity = subtract(this.velocity, mult(des, 0.01));
     //this.angle = -Math.atan2(this.velocity.x, this.velocity.y)+Math.PI/2;
   }
@@ -111,6 +129,7 @@ window.onload = function(){
     var moveTo = new Vector(0,0);
     moveTo = add(moveTo, this.cohesion());
     moveTo = add(moveTo, this.separate());
+    moveTo = add(moveTo, this.alignment());
     this.velocity = add(this.velocity, moveTo);
     this.angle = -Math.atan2(this.velocity.x, this.velocity.y)+Math.PI/2;
   }
@@ -137,7 +156,7 @@ window.onload = function(){
   }
 
   var arr = [];
-  for(var i=0;i<50;i++){
+  for(var i=0;i<100;i++){
     arr.push(new Boid(Math.random()*width, Math.random()*height, Math.random()*360, Math.random()*2, i));
   }
   //arr.push(new Boid(0,height/2, 0, 5, 0));
