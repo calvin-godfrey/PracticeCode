@@ -11,7 +11,6 @@ window.onload = function(){
     this.x = x;
     this.y = y;
     this.angle = a*Math.PI/180;
-    console.log(this.angle);
     this.velocity = v;
     this.velocityX = v*Math.cos(this.angle);
     this.velocityY = v*Math.sin(this.angle);
@@ -69,7 +68,7 @@ window.onload = function(){
       if(distance<this.radius){
         var deltaX = (this.x-arr[i].x);
         var deltaY = (this.y-arr[i].y);
-        var angle = Math.atan2(deltaX, deltaY);
+        var angle = -Math.atan2(deltaX, deltaY);
         var force = 30/distance;
         addX += force*Math.cos(angle);
         addY += force*Math.sin(angle);

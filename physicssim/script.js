@@ -108,7 +108,7 @@ window.onload = function(){
         var v2 = Math.sqrt(Math.pow(other.velocityX,2)+Math.pow(other.velocityY,2));
         var theta1 = Math.asin(this.velocityY/v1);
         var theta2 = Math.asin(other.velocityY/v2);
-        var phi = Math.asin(dy/dis);
+        var phi = Math.atan2(dx, dy);
         var tempV1X = (v2*Math.cos(theta2-phi))*Math.cos(phi)+v1*Math.sin(theta1-phi)*Math.cos(phi+Math.PI/2);
         var tempV1Y = (v2*Math.cos(theta2-phi))*Math.sin(phi)+v1*Math.sin(theta1-phi)*Math.sin(phi+Math.PI/2);
         var tempV2X = (v1*Math.cos(theta1-phi))*Math.cos(phi)+v2*Math.sin(theta2-phi)*Math.cos(phi+Math.PI/2);
@@ -130,6 +130,10 @@ window.onload = function(){
         other.velocityX = tempV2X;
         other.velocityY = tempV2Y;
         this.moveReally();
+        this.moveReally();
+        this.moveReally();
+        other.moveReally();
+        other.moveReally();
         other.moveReally();
       }
     }
