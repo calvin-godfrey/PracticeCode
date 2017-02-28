@@ -95,7 +95,7 @@ window.onload = function(){
     }
     avgX /= count;
     avgY /= count;
-    //return mult(new Vector(avgX, avgY), 0.05);
+    return mult(new Vector(avgX, avgY), 0.05);
     //this.velocity = add(this.velocity, mult(new Vector(avgX, avgY), 0.1));
     //this.angle = -Math.atan2(this.velocity.x, this.velocity.y)+Math.PI/2;
   }
