@@ -32,10 +32,10 @@ window.onload = function(){
     ctx.strokeStyle = "#000";
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(-20, 20);
-    ctx.lineTo(20, 20);
-    ctx.lineTo(0, -40);
-    ctx.lineTo(-20, 20);
+    ctx.moveTo(-7, 7);
+    ctx.lineTo(7, 7);
+    ctx.lineTo(0, -14);
+    ctx.lineTo(-7, 7);
     ctx.stroke();
     ctx.restore();
   }
@@ -47,10 +47,14 @@ window.onload = function(){
   }
 
   Boid.prototype.checkLocation = function(){
-    if(this.x<0||this.x>width||this.y<0||this.y>height){
+    if(this.x<0)this.x=width;
+    if(this.x>width)this.x=0;
+    if(this.y<0)this.y=height;
+    if(this.y>height)this.y=0;
+    /*if(this.x<0||this.x>width||this.y<0||this.y>height){
       this.x = Math.random()*width;
       this.y = Math.random()*height;
-    }
+    }*/
     if(this.velocity.magnitude()>this.maxSpeed){
       this.velocity = new Vector(this.velocity.magnitude()/this.maxSpeed*Math.cos(this.angle), this.velocity.magnitude()/this.maxSpeed*Math.sin(this.angle));
     }
@@ -75,9 +79,9 @@ window.onload = function(){
         addY += force*Math.sin(angle);
       }
     }
-    this.velocity.x += addX;
-    this.velocity.y += addY;
     return new Vector(addX, addY);
+    //this.velocity.x += addX;
+    //this.velocity.y += addY;
     //this.angle = -Math.atan2(this.velocity.x, this.velocity.y)+Math.PI/2;
   }
 
@@ -115,6 +119,7 @@ window.onload = function(){
     posX /= count;
     posY /= count;
     return this.seek(new Vector(posX, posY));
+    //this.seek(new Vector(posX, posY));
   }
 
   Boid.prototype.seek = function(target){
@@ -156,7 +161,7 @@ window.onload = function(){
   }
 
   var arr = [];
-  for(var i=0;i<100;i++){
+  for(var i=0;i<500;i++){
     arr.push(new Boid(Math.random()*width, Math.random()*height, Math.random()*360, Math.random()*2, i));
   }
   //arr.push(new Boid(0,height/2, 0, 5, 0));
