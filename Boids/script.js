@@ -30,6 +30,7 @@ window.onload = function(){
     ctx.translate(this.x, this.y);
     ctx.rotate(this.angle+Math.PI/2);
     ctx.strokeStyle = "#000";
+    ctx.fillStyle = "hsl(" + this.angle/(2*Math.PI)*360 + ",100%, 60%)";
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(-7, 7);
@@ -37,12 +38,18 @@ window.onload = function(){
     ctx.lineTo(0, -14);
     ctx.lineTo(-7, 7);
     ctx.stroke();
+    ctx.fill();
     ctx.restore();
   }
 
   Boid.prototype.step = function(){
-    this.x += this.velocity.x;
-    this.y += this.velocity.y;
+    if(isNaN(this.x)||isNaN(this.y)||isNaN(this.velocity.x)||isNaN(this.velocity.y)){
+      this.x = Math.random()*width;
+      this.y = Math.random()*height;
+      this.velocity = new Vector(Math.random(), Math.random());
+    }
+    this.x += this.velocity.x*2;
+    this.y += this.velocity.y*2;
     this.checkLocation();
   }
 
@@ -61,7 +68,35 @@ window.onload = function(){
   }
 
   Boid.prototype.getDistance = function(other){
-    return Math.pow(Math.pow(this.x-other.x, 2)+Math.pow(this.y-other.y, 2), 0.5);
+    var d1 = Math.pow(Math.pow(this.x-other.x, 2)+Math.pow(this.y-other.y, 2), 0.5);
+    return d1;
+    //if(d1<this.radius)return d1;
+    /*if(this.x<other.x){
+      var d2 = Math.pow(Math.pow(this.x+width-other.x, 2)+Math.pow(this.y-other.y, 2), 0.5);
+    } else {
+      var d2 = Math.pow(Math.pow(other.x+width-this.x, 2)+Math.pow(other.y-this.y, 2), 0.5);
+    }
+    if(d2<this.radius)return d2;
+    if(this.y<other.y){
+      var d3 = Math.pow(Math.pow(this.x-other.x, 2)+Math.pow(this.y+height-other.y, 2), 0.5);
+    } else {
+      var d3 = Math.pow(Math.pow(other.x-this.x, 2)+Math.pow(other.y+height-this.y, 2), 0.5);
+    }
+    if(d3<this.radius)return d3;
+    if(this.x<other.x){
+      if(this.y<other.y){
+        var d4 = Math.pow(Math.pow(this.x+width-other.x, 2)+Math.pow(this.y+height-other.y, 2), 0.5);
+      } else {
+        var d4 = Math.pow(Math.pow(this.x+width-other.x, 2)+Math.pow(other.y+height-this.y, 2), 0.5);
+      }
+    } else {
+      if(this.y<other.y){
+        var d4 = Math.pow(Math.pow(other.x+width-this.y, 2)+Math.pow(other.y-this.y-height, 2), 0.5);
+      } else {
+        var d4 = Math.pow(Math.pow(other.x+width-this.y, 2)+Math.pow(this.y-other.y-height, 2), 0.5);
+      }
+    }
+    return d4;*/
   }
 
   Boid.prototype.separate = function(){
@@ -91,6 +126,7 @@ window.onload = function(){
     var count = 0;
     for(var i=0;i<arr.length;i++){
       if(arr[i].id==this.id)continue;
+      if(isNaN(arr[i].velocity.x)||isNaN(arr[i].velocity.y))continue;
       if(this.getDistance(arr[i])<this.radius){
         avgX += arr[i].velocity.x;
         avgY += arr[i].velocity.y;
@@ -110,6 +146,7 @@ window.onload = function(){
     var count = 0;
     for(var i=0;i<arr.length;i++){
       if(arr[i].id==this.id)continue;
+      if(isNaN(arr[i].x)||isNaN(arr[i].y))continue;
       if(this.getDistance(arr[i])<this.radius){
         posX += arr[i].x;
         posY += arr[i].y;
@@ -140,7 +177,7 @@ window.onload = function(){
   }
 
   function drawBackground(){
-    ctx.fillStyle = "#FFF";
+    ctx.fillStyle = "#8ED6FF";
     ctx.fillRect(0,0,canvas.width,canvas.height);
   }
 
@@ -161,7 +198,7 @@ window.onload = function(){
   }
 
   var arr = [];
-  for(var i=0;i<500;i++){
+  for(var i=0;i<700;i++){
     arr.push(new Boid(Math.random()*width, Math.random()*height, Math.random()*360, Math.random()*2, i));
   }
   //arr.push(new Boid(0,height/2, 0, 5, 0));
