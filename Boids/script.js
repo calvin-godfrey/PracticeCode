@@ -27,7 +27,7 @@ window.onload = function(){
     this.angle = a*Math.PI/180;
     this.velocity = new Vector(v*Math.cos(this.angle), v*Math.sin(this.angle));
     this.radius = 250;
-    this.maxSpeed = 4cd ..;
+    this.maxSpeed = 4;
   }
 
   Boid.prototype.draw = function(){
