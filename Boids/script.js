@@ -1,3 +1,4 @@
+
 window.onload = function(){
   var canvas = document.getElementById("canvas");
   canvas.width = screen.width;
@@ -5,6 +6,10 @@ window.onload = function(){
   var height = canvas.height;
   var width = canvas.width;
   var ctx = canvas.getContext("2d");
+  var SEPARATE_SCALE = 0.5;
+  var COHESION_SCALE = 0.10;
+  var ALIGNMENT_SCALE = 0.10;
+  var MOVE_SCALE = 2;
 
   function Vector(x, y){
     this.x = x;
@@ -22,7 +27,7 @@ window.onload = function(){
     this.angle = a*Math.PI/180;
     this.velocity = new Vector(v*Math.cos(this.angle), v*Math.sin(this.angle));
     this.radius = 250;
-    this.maxSpeed = 5;
+    this.maxSpeed = 4cd ..;
   }
 
   Boid.prototype.draw = function(){
@@ -33,10 +38,10 @@ window.onload = function(){
     ctx.fillStyle = "hsl(" + this.angle/(2*Math.PI)*360 + ",100%, 60%)";
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(-7, 7);
-    ctx.lineTo(7, 7);
-    ctx.lineTo(0, -14);
-    ctx.lineTo(-7, 7);
+    ctx.moveTo(-4, 4);
+    ctx.lineTo(4, 4);
+    ctx.lineTo(0, -8);
+    ctx.lineTo(-4, 4);
     ctx.stroke();
     ctx.fill();
     ctx.restore();
@@ -48,8 +53,8 @@ window.onload = function(){
       this.y = Math.random()*height;
       this.velocity = new Vector(Math.random(), Math.random());
     }
-    this.x += this.velocity.x*2;
-    this.y += this.velocity.y*2;
+    this.x += this.velocity.x*MOVE_SCALE;
+    this.y += this.velocity.y*MOVE_SCALE;
     this.checkLocation();
   }
 
@@ -63,7 +68,8 @@ window.onload = function(){
       this.y = Math.random()*height;
     }*/
     if(this.velocity.magnitude()>this.maxSpeed){
-      this.velocity = new Vector(this.velocity.magnitude()/this.maxSpeed*Math.cos(this.angle), this.velocity.magnitude()/this.maxSpeed*Math.sin(this.angle));
+      this.velocity = mult(this.velocity, this.maxSpeed/this.velocity.magnitude());
+      //this.velocity = new Vector(this.velocity.magnitude()/this.maxSpeed*Math.cos(this.angle), this.velocity.magnitude()/this.maxSpeed*Math.sin(this.angle));
     }
   }
 
@@ -114,7 +120,7 @@ window.onload = function(){
         addY += force*Math.sin(angle);
       }
     }
-    return new Vector(addX, addY);
+    return mult(new Vector(addX, addY), SEPARATE_SCALE);
     //this.velocity.x += addX;
     //this.velocity.y += addY;
     //this.angle = -Math.atan2(this.velocity.x, this.velocity.y)+Math.PI/2;
@@ -135,7 +141,7 @@ window.onload = function(){
     }
     avgX /= count;
     avgY /= count;
-    return mult(new Vector(avgX, avgY), 0.05);
+    return mult(new Vector(avgX, avgY), ALIGNMENT_SCALE);
     //this.velocity = add(this.velocity, mult(new Vector(avgX, avgY), 0.1));
     //this.angle = -Math.atan2(this.velocity.x, this.velocity.y)+Math.PI/2;
   }
@@ -162,7 +168,7 @@ window.onload = function(){
   Boid.prototype.seek = function(target){
     var posVector = new Vector(this.x, this.y);
     var des = mult(normalize(subtract(posVector, target)), this.maxSpeed);
-    return mult(des, -0.02);
+    return mult(des, -COHESION_SCALE);
     //this.velocity = subtract(this.velocity, mult(des, 0.01));
     //this.angle = -Math.atan2(this.velocity.x, this.velocity.y)+Math.PI/2;
   }
@@ -198,7 +204,7 @@ window.onload = function(){
   }
 
   var arr = [];
-  for(var i=0;i<700;i++){
+  for(var i=0;i<300;i++){
     arr.push(new Boid(Math.random()*width, Math.random()*height, Math.random()*360, Math.random()*2, i));
   }
   //arr.push(new Boid(0,height/2, 0, 5, 0));
