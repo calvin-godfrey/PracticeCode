@@ -14,7 +14,7 @@ def display_info(p, p_show, c, c_show, r, r_show, t, t_show, g, g_show):
     print "Period".ljust(BUFFER_SIZE)*int(p_show)+ "|Course".ljust(BUFFER_SIZE)*int(c_show) + "|Room".ljust(BUFFER_SIZE-9)*int(r_show) + "|Teacher".ljust(BUFFER_SIZE)*int(t_show) + "|Grade"*int(g_show)
     print "-"*75
     for i in range(len(p)): #They should all be the same length
-        print (p[i].ljust(BUFFER_SIZE) + "|")*int(p_show) + (c[i].ljust(BUFFER_SIZE) + "|")*int(c_show) + (r[i].ljust(BUFFER_SIZE-9) + "|")*int(r_show) + (t[i].ljust(BUFFER_SIZE) + "|")*int(t_show) + (g[i].ljust(BUFFER_SIZE))*int(g_show)
+        print (p[i].ljust(BUFFER_SIZE))*int(p_show) + ("|"+ c[i].ljust(BUFFER_SIZE))*int(c_show) + ("|" + r[i].ljust(BUFFER_SIZE-9))*int(r_show) + ("|" + t[i].ljust(BUFFER_SIZE))*int(t_show) + ("|" + g[i].ljust(BUFFER_SIZE))*int(g_show)
 
 def save_grades(grades): #To see if any are updated later on
     open("grades.txt", "w").close() #Make sure the file is empty
