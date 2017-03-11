@@ -30,10 +30,20 @@ def rightClick(x, y):
 def leftClick(x, y):
     """Clicks at given coordinates"""
     api.SetCursorPos((x/40, y/54))
-    t.sleep(0.5)
+    t.sleep(0.05)
     api.mouse_event(con.MOUSEEVENTF_LEFTDOWN|con.MOUSEEVENTF_ABSOLUTE, x, y, 0, 0)
     api.mouse_event(con.MOUSEEVENTF_LEFTUP|con.MOUSEEVENTF_ABSOLUTE, x, y, 0, 0)
-    
+
+def dragLeft(x1, y1, x2, y2):
+    deltaX = (x2-x1)/20.0
+    deltaY = (y2-y1)/20.0
+    api.SetCursorPos((x1, y1))
+    api.mouse_event(con.MOUSEEVENTF_LEFTDOWN|con.MOUSEEVENTF_ABSOLUTE, x1, y1, 0, 0)
+    for i in range(1, 21):
+        t.sleep(0.01)
+        api.SetCursorPos(((int(x1+(deltaX*i)), int(y1+(deltaY*i)))))
+    api.mouse_event(con.MOUSEEVENTF_LEFTUP|con.MOUSEEVENTF_ABSOLUTE, x2, y2, 0, 0)
+
 def typeLetter(letter):
     if letter in "/.,":
         x = ord(letter)+144+32 #Difference between ord() and what the function wants
@@ -41,7 +51,7 @@ def typeLetter(letter):
         x = ord(letter)
     api.keybd_event(x-32, 0, con.KEYEVENTF_EXTENDEDKEY, 0)
     api.keybd_event(x-32, 0, con.KEYEVENTF_KEYUP, 0)
-    
+
 def typeLettersTime(letters, time): #Letters is an array
     for letter in letters:
         if letter in ",.":
@@ -60,7 +70,7 @@ def typeLettersTime(letters, time): #Letters is an array
         else:
             x = ord(letter)
         api.keybd_event(x-32, 0, con.KEYEVENTF_KEYUP, 0)
-        
+
 def typeLetterTime(letter, time):
     if letter in "/,.":
         x = ord(letter)+144+32
@@ -71,8 +81,8 @@ def typeLetterTime(letter, time):
     api.keybd_event(x-32, 0, con.KEYEVENTF_EXTENDEDKEY, 0)
     t.sleep(time)
     api.keybd_event(x-32, 0, con.KEYEVENTF_KEYUP, 0)
-        
-    
-def getCursor():
-    t.sleep(4)
+
+
+def getCursor(delay):
+    t.sleep(delay)
     return list(api.GetCursorPos())
