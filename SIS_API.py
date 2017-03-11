@@ -8,6 +8,7 @@ parser.add_argument('-p', '--period', help="Table without the periods column", a
 parser.add_argument('-c', '--course', help="Table without the courses column", action="store_true")
 parser.add_argument('-t', '--teacher', help="Table without the teachers column", action="store_true")
 parser.add_argument('-r', '--room', help="Table without the room number column", action="store_true")
+parser.add_argument('-s', '--skip', help="Ignores username/password stored in SIS_DATA even if it exists; username/password MUST be typed in", action="store_true")
 
 def display_info(p, p_show, c, c_show, r, r_show, t, t_show, g, g_show):
     BUFFER_SIZE = 18
@@ -29,7 +30,7 @@ def load_grades():
     return open("grades.txt", "r").readlines()
 
 def main(disp_p, disp_c, disp_r, disp_t, disp_g):
-    if os.path.isfile("SIS_DATA.txt"): #Cause I don't want to type in my password every time
+    if os.path.isfile("SIS_DATA.txt") and not(args.skip): #Cause I don't want to type in my password every time
         login_info = open("SIS_DATA.txt", "r").readlines()
         username = login_info[0].strip()
         password = login_info[1].strip()
