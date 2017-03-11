@@ -3,8 +3,9 @@ url = "https://sisstudent.fcps.edu"
 br = mechanize.Browser()
 login_info = open("SIS_DATA.txt", "r") #So that y'all don't know my information
 login_info = login_info.readlines()
-username = login_info[0][1:-2] #cuts of unnecessary stuff
-password = login_info[1][1:-2]
+username = login_info[0].strip() #cuts of unnecessary stuff
+password = login_info[1].strip()
+
 def display_info(p, c, r, t, g):
     BUFFER_SIZE = 18
     print "Period".ljust(BUFFER_SIZE)+ "|" + "Course".ljust(BUFFER_SIZE) + "|" + "Room".ljust(BUFFER_SIZE-9) + "|" + "Teacher".ljust(BUFFER_SIZE) + "|Grade" #Room is shorter because it doesn't need all those

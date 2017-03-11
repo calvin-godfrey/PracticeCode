@@ -6,11 +6,11 @@ window.onload = function(){
   var height = canvas.height;
   var width = canvas.width;
   var ctx = canvas.getContext("2d");
-  var SEPARATE_SCALE = 20;
-  var COHESION_SCALE = 0.10;
+  var SEPARATE_SCALE = 10;
+  var COHESION_SCALE = .3;
   var ALIGNMENT_SCALE = 10;
   var MOVE_SCALE = 1;
-  var RANDOM_SCALE = 0.7;
+  var RANDOM_SCALE = 4;
 
   function Vector(x, y){
     this.x = x;
@@ -53,9 +53,9 @@ window.onload = function(){
       this.x = Math.random()*width;
       this.y = Math.random()*height;
       this.velocity = new Vector(Math.random(), Math.random());
-    }
-    this.x += this.velocity.x*MOVE_SCALE + Math.random()*-0.5+0.25;
-    this.y += this.velocity.y*MOVE_SCALE + Math.random()*-0.5+0.25;
+  }
+    this.x += this.velocity.x*MOVE_SCALE;
+    this.y += this.velocity.y*MOVE_SCALE;
     this.checkLocation();
   }
 
@@ -85,8 +85,11 @@ window.onload = function(){
       if(arr[i].id==this.id)continue;
       var distance = this.getDistance(arr[i]);
       if(distance<this.radius){
-        var distanceVector = new Vector(delta(this.x, arr[i].x, width), delta(this.y,arr[i].y, height));
+        var distanceVector = new Vector(delta(this.x, arr[i].x, width), delta(this.y, arr[i].y, height));
+        //if(this.x<arr[i].x)distanceVector = new Vector(-distanceVector.x, distanceVector.y);
+        //if(this.y<arr[i].y)distanceVector = new Vector(distanceVector.x, -distanceVector.y);
         distanceVector = normalize(distanceVector);
+        //if(distanceVector.magnitude()!=1)console.log("UHOH");
         addX += distanceVector.x/distance;
         addY += distanceVector.y/distance;
       }
@@ -148,9 +151,9 @@ window.onload = function(){
 
   Boid.prototype.move = function(){
     var moveTo = new Vector(0,0);
-    //moveTo = add(moveTo, this.cohesion());
+    moveTo = add(moveTo, this.cohesion());
     moveTo = add(moveTo, this.separate());
-    //moveTo = add(moveTo, this.alignment());
+    moveTo = add(moveTo, this.alignment());
     moveTo = add(moveTo, new Vector(Math.random()*-RANDOM_SCALE+RANDOM_SCALE/2, Math.random()*-RANDOM_SCALE+RANDOM_SCALE/2));
     this.velocity = add(this.velocity, moveTo);
     this.angle = -Math.atan2(this.velocity.x, this.velocity.y)+Math.PI/2;
@@ -180,11 +183,24 @@ window.onload = function(){
   function delta(a1, a2, aBoundary){
     //return Math.min(Math.abs(a2-a1), Math.abs(Math.abs(a2-a1)-aBoundary));
     var raw = Math.abs(a1-a2);
-    return (raw<aBoundary/2)?raw:aBoundary-raw;
+    var dist = a1-a2;
+    var sign = 1;
+    if(raw<aBoundary/2){
+        var sign = dist<0?1:-1;
+    }
+    if(raw>=aBoundary/2){
+        var sign = dist<0?-1:1;
+    }
+    /*if((dist<aBoundary/2&&dist>0)||dist<-aBoundary/2){
+        var sign = -1;
+    } else {
+        var sign = 1;
+    }*/
+    return (raw<aBoundary/2)?raw*sign:(aBoundary-raw)*sign;
   }
 
   var arr = [];
-  for(var i=0;i<300;i++){
+  for(var i=0;i<1e3;i++){
     arr.push(new Boid(Math.random()*width, Math.random()*height, Math.random()*360, Math.random()*2, i));
   }
   //arr.push(new Boid(10,10, 0, 0, 0));

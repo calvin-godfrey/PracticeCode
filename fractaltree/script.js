@@ -1,6 +1,7 @@
 window.onload = function(){
   var c = document.getElementById("canvas");
   var ANGLE;
+  var needUpdate = false;
   c.width = screen.width*0.9;
   c.height = screen.height*0.9;
   var width = c.width;
@@ -8,15 +9,17 @@ window.onload = function(){
   var branchArray;
   var ctx = c.getContext("2d");
   var getAngle = setInterval(function(){
+    if(ANGLE==document.getElementById("angle").value)return;
     ANGLE = document.getElementById("angle").value;
     ANGLE = ANGLE*Math.PI/180;
+    needUpdate = true;
   }, 100);
 
   var Base = function(){
     this.x = width/2;
     this.y = height;
     this.angle = -Math.PI/2;
-    this.length = 300;
+    this.length = height/4;
     this.toX = this.x + this.length*Math.cos(this.angle);
     this.toY = this.y + this.length*Math.sin(this.angle);
     this.isUpdated = true;
@@ -34,7 +37,7 @@ window.onload = function(){
     this.parent = parent;
     this.x = parent.toX;
     this.y = parent.toY;
-    this.length = parent.length*0.7;
+    this.length = parent.length*0.72;
     this.side = side;
     this.angle = this.parent.angle + angle;
     if(this.side==0)this.angle = Math.PI-this.angle;
@@ -92,7 +95,7 @@ window.onload = function(){
       isParent[i] = true;
     }
   }
-  for(var i=0;i<16383;i++){
+  for(var i=0;i<16384/2;i++){
     var len = branchArray.length;
     for(var j=0;j<len;j++){
       addToArray(j);
@@ -100,11 +103,13 @@ window.onload = function(){
   }
 
   var keepDraw = setInterval(function(){
+    if(!needUpdate)return;
     ctx.fillStyle = "#FFF";
     ctx.fillRect(0,0,width,height);
     for(var i=0;i<branchArray.length;i++){
       branchArray[i].draw();
     }
-  }, 100);
+    needUpdate = false;
+  }, 1);
 
 };
