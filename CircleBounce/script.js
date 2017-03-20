@@ -2,7 +2,7 @@ window.onload = function(){
     var canvas = document.getElementById("canvas");
     var gravity = document.getElementById("gravity");
     var useGravity;
-    var GRAVITY = 4;
+    var GRAVITY = 3;
     var checkGravity = setInterval(function(){
       useGravity = gravity.checked;
     }, 5);
@@ -22,14 +22,17 @@ window.onload = function(){
         this.magnitude = Math.pow(Math.pow(x,2)+Math.pow(y,2),0.5);
     }
 
-    var Ball = function(x, y){
+    var Ball = function(x, y, id){
       this.x = x;
+      this.id = id;
       this.y = y;
       this.prevX = x;
       this.prevY = y;
       this.isDone = false;
       this.color = "#FFF";
       this.radius = 8;
+      this.delay = 0;
+      this.mass = this.radius;
     }
 
     Ball.prototype.draw = function(){
@@ -52,23 +55,49 @@ window.onload = function(){
     Ball.prototype.step = function(){
         this.x += this.velocity.x;
         this.y += this.velocity.y;
-        if(useGravity)this.velocity.y += GRAVITY;
-        this.checkLocation();
+        if(useGravity){this.velocity.y += GRAVITY;if(this.velocity.y>20)this.velocity.y=20;}
+        if(this.delay>0)this.delay--;
     }
 
     Ball.prototype.checkLocation = function(){
         var epsilon = this.radius;
         var distance = Math.pow(Math.pow(this.x-width/2, 2)+Math.pow(this.y-height/2, 2), 0.5);
-        if(distance>200-epsilon&&distance<200+epsilon){
+        if(distance>200-epsilon&&distance<200+epsilon&&this.delay==0){
+            this.delay = 0;
             var slope = -(this.x-width/2)/(this.y-height/2); //Implicit differentiation!
-            var normalAngle = Math.atan2(this.x-width/2, this.y-height/2);
-            var normal = new Vector(Math.cos(normalAngle), Math.sin(normalAngle));
-            var velocitySlope = this.velocity.magnitude;
-            var angle = Math.atan(Math.abs((slope-velocitySlope)/(1+slope*velocitySlope)));
-            var perpAngle = Math.PI/2-angle;
-            var u = new Vector((dotProduct(this.velocity, normal, perpAngle))*normal.x, (dotProduct(this.velocity, normal, perpAngle))*normal.y);
+            var normalSlope = -1/slope;
+            var normal = new Vector(1, -1/slope);
+            var velocitySlope = this.velocity.y/(this.velocity.x+1e-10); //So that we don't divide by 0
+            var perpAngle = Math.acos(dotProduct(this.velocity, normal)/(this.velocity.magnitude*normal.magnitude));
+            var u = new Vector((dotProduct(this.velocity, normal)/dotProduct(normal, normal))*normal.x, (dotProduct(this.velocity, normal)/dotProduct(normal, normal))*normal.y);
             var w = new Vector(this.velocity.x-u.x, this.velocity.y-u.y);
             this.velocity = new Vector(w.x-u.x, w.y-u.y);
+            //this.velocity = mult_scalar(this.velocity, 0.3);
+        }
+    }
+
+    Ball.prototype.ballCollision = function(){
+        for(var i=0;i<ballArray.length;i++){
+            other = ballArray[i];
+            if(other.id==this.id||!other.isDone)continue;
+            if(this.x+this.radius+other.radius>other.x
+            && this.x<other.x+this.radius+other.radius
+            && this.y+this.radius+other.radius>this.y
+            && this.y < other.y+this.radius+other.radius){
+                var distance = Math.pow(Math.pow(this.x-other.x, 2)+Math.pow(this.y-other.y,2),0.5);
+                if (distance < this.radius*2){ //We have collision
+                    var n = new Vector((other.x-this.x)/distance, (other.y-this.y)/distance)
+                    var p = (2*(dotProduct(this.velocity, n)-dotProduct(other.velocity, n)))/(this.mass+other.mass);
+                    var vx1 = this.velocity.x - p*this.mass*n.x;
+                    var vy1 = this.velocity.y - p*this.mass*n.y;
+                    var vx2 = other.velocity.x + p*other.mass*n.x;
+                    var vy2 = other.velocity.y + p*other.mass*n.y;
+                    this.velocity = new Vector(vx1, vy1);
+                    this.step();
+                    other.velocity = new Vector(vx2, vy2);
+                    other.step();
+                }
+            }
         }
     }
 
@@ -87,8 +116,12 @@ window.onload = function(){
       ctx.stroke();
     }
 
-    function dotProduct(v1, v2, angle){
-        return v1.magnitude*v2.magnitude*Math.cos(angle);
+    function dotProduct(v1, v2){
+        return v1.x*v2.x + v1.y*v2.y;
+    }
+
+    function mult_scalar(vector, scalar){
+        return new Vector(vector.x*scalar, vector.y*scalar);
     }
 
     function getMousePos(canvas, evt){
@@ -108,6 +141,12 @@ window.onload = function(){
             ballArray[i].draw();
             if(ballArray[i].isDone)ballArray[i].step();
         }
+        for(var i=0;i<ballArray.length;i++){
+            if(ballArray[i].isDone){
+                ballArray[i].ballCollision();
+                ballArray[i].checkLocation();
+            }
+        }
         requestAnimationFrame(main);
     }
 
@@ -122,7 +161,7 @@ window.onload = function(){
       tempPrevEndLocation.x = startClickLocation.x;
       tempPrevEndLocation.y = startClickLocation.y;
       isMouseDown = true;
-      ballArray.push(new Ball(startClickLocation.x, startClickLocation.y));
+      ballArray.push(new Ball(startClickLocation.x, startClickLocation.y, ballArray.length));
       ballArray[ballArray.length-1].draw();
     });
 
