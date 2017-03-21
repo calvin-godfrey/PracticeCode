@@ -21,6 +21,13 @@ window.onload = function(){
   tempPrevEndLocation = {x:null, y:null};
   var isMouseDown = false;
   var color = ["#F00", "#000", "#0F0", "#00F", "#FF0", "#F0F", "#0FF"];
+
+  var Vector = function(x, y){
+      this.x = x;
+      this.y = y;
+      this.magnitude = Math.pow(Math.pow(x, 2)+Math.pow(y, 2), 0.5);
+  }
+
   var Ball = function(x, y){
     this.x = x;
     this.y = y;
@@ -28,6 +35,7 @@ window.onload = function(){
     this.prevY = y;
     this.isDone = false;
     this.color = color[Math.floor(Math.random()*color.length)];
+    this.mass = RADIUS;
   }
 
   Ball.prototype.draw = function(){
@@ -38,15 +46,6 @@ window.onload = function(){
     ctx.fillStyle = this.color;
     ctx.fill();
     this.life-=1;
-  }
-
-  Ball.prototype.erase = function(){
-    ctx.beginPath();
-    ctx.arc(this.prevX, this.prevY, RADIUS, 0, Math.PI*2);
-    ctx.strokeStyle = "#FFF";
-    ctx.stroke();
-    ctx.fillStyle = "#FFF";
-    ctx.fill();
   }
 
   Ball.prototype.setup = function(endX, endY){
@@ -68,7 +67,6 @@ window.onload = function(){
     this.x += this.velocityX;
     this.y += this.velocityY;
     this.velocityY += GRAVITY;
-    this.erase();
     this.draw();
     this.prevX = this.x;
     this.prevY = this.y;
@@ -102,7 +100,15 @@ window.onload = function(){
       else if(distance(this, ballArray[i])<=RADIUS*2){
         var other = ballArray[i];
         var dis = distance(this, other);
-        var dx = this.x-other.x;
+        this.velocity = new Vector(this.velocityX, this.velocityY);
+        other.velocity = new Vector(other.velocityX, other.velocityY);
+        var n = new Vector((other.x-this.x)/dis, (other.y-this.y)/dis);
+        var p = (2*(dotProduct(this.velocity, n)-dotProduct(other.velocity, n)))/(this.mass+other.mass);
+        this.velocityx = this.velocity.x - p*this.mass*n.x;
+        this.velocityY = this.velocity.y - p*this.mass*n.y;
+        other.velocityX = other.velocity.x + p*other.mass*n.x;
+        other.velocityY = other.velocity.y + p*other.mass*n.y;
+        /*var dx = this.x-other.x;
         var dy = this.y-other.y;
         var v1 = Math.sqrt(Math.pow(this.velocityX,2)+Math.pow(this.velocityY,2));
         var v2 = Math.sqrt(Math.pow(other.velocityX,2)+Math.pow(other.velocityY,2));
@@ -134,14 +140,19 @@ window.onload = function(){
         this.moveReally();
         other.moveReally();
         other.moveReally();
-        other.moveReally();
+        other.moveReally();*/
       }
     }
   }
 
-  function getMousePos(canvas, event){
+  function dotProduct(v1, v2){
+      return v1.x*v2.x+v1.y*v2.y;
+  }
+
+  function getMousePos(canvas, evt){
     var rect = canvas.getBoundingClientRect();
-    return {x:event.clientX - rect.left, y:event.clientY - rect.top};
+    return {x: (evt.clientX-rect.left)/(rect.right-rect.left)*canvas.width,
+      y: (evt.clientY-rect.top)/(rect.bottom-rect.top)*canvas.height};
   }
 
   function distance(ball, other){
@@ -193,6 +204,8 @@ window.onload = function(){
   });
 
   var animate = function(){
+    ctx.fillStyle = "#FFF";
+    ctx.fillRect(0,0,width,height);
     for(var i=0;i<ballArray.length;i++){
       if(ballArray[i].isDone==false){
         continue;
