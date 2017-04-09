@@ -10,6 +10,7 @@ window.onload = function(){
     canvas.height = screen.height;
     var width = canvas.width;
     var height = canvas.height;
+    var RADIUS = height/3;
     var ctx = canvas.getContext("2d");
     var startClickLocation, endClickLocation, tempEndLocation, tempPrevEndLocation, isMouseDown;
     var ballArray = [];
@@ -62,7 +63,7 @@ window.onload = function(){
     Ball.prototype.checkLocation = function(){
         var epsilon = this.radius;
         var distance = Math.pow(Math.pow(this.x-width/2, 2)+Math.pow(this.y-height/2, 2), 0.5);
-        if(distance>200-epsilon&&distance<200+epsilon&&this.delay==0){
+        if(distance>RADIUS-epsilon&&distance<RADIUS+epsilon&&this.delay==0){
             this.delay = 0;
             var slope = -(this.x-width/2)/(this.y-height/2); //Implicit differentiation!
             var normalSlope = -1/slope;
@@ -135,7 +136,7 @@ window.onload = function(){
         ctx.fillRect(0,0,width,height);
         ctx.beginPath();
         ctx.lineWidth = 1;
-        ctx.arc(width/2, height/2, 200, 0, Math.PI*2);
+        ctx.arc(width/2, height/2, RADIUS, 0, Math.PI*2);
         ctx.stroke();
         for(var i=0;i<ballArray.length;i++){
             ballArray[i].draw();
