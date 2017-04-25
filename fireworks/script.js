@@ -110,8 +110,9 @@ window.onload = function(){
   }
 
   function drawLines(arr){
-    for(var i=0;i<arr.length-1;i++){
-      drawLine(arr[i][0], arr[i][1], arr[i+1][0], arr[i+1][1]);
+    for(var i=0;i<arr.length;i++){
+      for(var j=0;j<arr[i].length-1;j++)
+      drawLine(arr[i][j][0], arr[i][j][1], arr[i][j+1][0], arr[i][j+1][1]);
     }
   }
 
@@ -121,15 +122,19 @@ window.onload = function(){
     var minY = 1e10;
     var maxY = -1e10;
     for(var i=0;i<drawing.length;i++){
-      if(drawing[i][0]<minX)minX = drawing[i][0];
-      if(drawing[i][0]>maxX)maxX = drawing[i][0];
-      if(drawing[i][1]<minY)minY = drawing[i][1];
-      if(drawing[i][1]>maxY)maxY = drawing[i][1];
+      for(var j=0;j<drawing[i].length;j++){
+        if(drawing[i][j][0]<minX)minX = drawing[i][j][0];
+        if(drawing[i][j][0]>maxX)maxX = drawing[i][j][0];
+        if(drawing[i][j][1]<minY)minY = drawing[i][j][1];
+        if(drawing[i][j][1]>maxY)maxY = drawing[i][j][1];
+      }
     }
     var avgX = (minX+maxX)/2;
     var avgY = (minY+maxY)/2;
     for(var i=0;i<drawing.length;i++){
-      realDrawing.push([(avgX-drawing[i][0])/avgX, (avgY-drawing[i][1])/avgY]);
+      for(var j=0;j<drawing[i].length;j++){
+        realDrawing.push([(avgX-drawing[i][j][0])/avgX, (avgY-drawing[i][j][1])/avgY]);
+      }
     }
   }
 
@@ -160,6 +165,8 @@ window.onload = function(){
     if(started){
       var pos = getMousePos(canvas, event);
       rockets.push(new Firework(pos.x));
+    } else {
+      drawing.push([]);
     }
 
   });
@@ -171,7 +178,7 @@ window.onload = function(){
   canvas.addEventListener("mousemove", function(event){
     if(!mouseDown||started)return;
     var pos = getMousePos(canvas, event);
-    drawing.push([pos.x, pos.y]);
+    drawing[drawing.length-1].push([pos.x, pos.y]);
   });
 
   document.getElementById("start").addEventListener("mousedown", function(event){
