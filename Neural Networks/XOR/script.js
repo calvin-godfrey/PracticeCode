@@ -98,6 +98,7 @@ window.onload = function(){
   }
 
   function eliminate(networks){ //networks should be sorted by fitness
+<<<<<<< HEAD
     for(var i=0;i<networks.length;i++){
       var chance = Math.random()*(i*0.5+10);
       if(chance > 9.5){
@@ -105,6 +106,16 @@ window.onload = function(){
       }
     }
     return networks.filter(function(a){return a!=0}); //Remove all the 0's
+=======
+    return networks.splice(0, 2);
+    /*for(var i=0;i<networks.length;i++){
+      var chance = Math.random()*(i*0.5+10);
+      if(chance > 15){
+        networks[i] = 0;
+      }
+    }
+    *///return networks.filter(function(a){return a!=0}); //Remove all the 0's
+>>>>>>> a8c0f5a3cb202113d39b95f77db5deabc827b6b3
   }
 
   function populate(networks, size){
@@ -138,7 +149,7 @@ window.onload = function(){
         for(var k=0;k<neuron1.weights.length;k++){
           var weight1 = neuron1.weights[k];
           var weight2 = neuron2.weights[k];
-          newValues[i][j][0].push((weight1+weight2)/2 + (-1*Math.random()+0.5)); //Keep random ammount
+          newValues[i][j][0].push((weight1+weight2)/2);// + (-1*Math.random()+0.5)); //Keep random ammount
         }
         if(i!=0){
           var bias1 = neuron1.bias;
@@ -147,7 +158,7 @@ window.onload = function(){
         }
       }
     }
-    console.log(newValues);
+    //console.log(newValues);
     child.setValues(newValues);
     return child;
   }
@@ -172,7 +183,7 @@ window.onload = function(){
     for(var i=0;i<50;i++){
       networks.push(new Network([2, 1, 1], true));
     }
-    for(var z=0;z<10;z++){
+    for(var z=0;z<100;z++){
       console.log("--------------------");
       networks = generation(networks);
 
