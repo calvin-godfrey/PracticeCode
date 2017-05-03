@@ -11,15 +11,18 @@ window.onload = function(){
   var height = canvas.height;
   var ctx = canvas.getContext("2d");
   var ballArray = [];
+  var lineArray = [];
   var startClickLocation, endClickLocation, tempEndLocation, tempPrevEndLocation;
   var FACTOR = 0.08;
   var GRAVITY = 0.2; //Arbitrary number unrelated to 9.8 m/s^2
   var RADIUS = 20;
-  var REBOUND = -0.78;
+  var REBOUND = -0.985; //For reason this "conserves energy"
   var MASS = 5;
   tempEndLocation = {x:null, y:null};
   tempPrevEndLocation = {x:null, y:null};
   var isMouseDown = false;
+  var isRightMouseDown = false;
+  var start = {x:null, y:null};
   var color = ["#F00", "#000", "#0F0", "#00F", "#FF0", "#F0F", "#0FF"];
 
   var Vector = function(x, y){
@@ -60,6 +63,7 @@ window.onload = function(){
     if(useCollision){
       this.checkWallCollision();
       this.checkBallCollision();
+      this.checkLineCollision();
     }
   }
 
@@ -108,41 +112,47 @@ window.onload = function(){
         this.velocityY = this.velocity.y - p*this.mass*n.y;
         other.velocityX = other.velocity.x + p*other.mass*n.x;
         other.velocityY = other.velocity.y + p*other.mass*n.y;
-        /*var dx = this.x-other.x;
-        var dy = this.y-other.y;
-        var v1 = Math.sqrt(Math.pow(this.velocityX,2)+Math.pow(this.velocityY,2));
-        var v2 = Math.sqrt(Math.pow(other.velocityX,2)+Math.pow(other.velocityY,2));
-        var theta1 = Math.asin(this.velocityY/v1);
-        var theta2 = Math.asin(other.velocityY/v2);
-        var phi = Math.atan2(dx, dy);
-        var tempV1X = (v2*Math.cos(theta2-phi))*Math.cos(phi)+v1*Math.sin(theta1-phi)*Math.cos(phi+Math.PI/2);
-        var tempV1Y = (v2*Math.cos(theta2-phi))*Math.sin(phi)+v1*Math.sin(theta1-phi)*Math.sin(phi+Math.PI/2);
-        var tempV2X = (v1*Math.cos(theta1-phi))*Math.cos(phi)+v2*Math.sin(theta2-phi)*Math.cos(phi+Math.PI/2);
-        var tempV2Y = (v1*Math.cos(theta1-phi))*Math.sin(phi)+v2*Math.sin(theta2-phi)*Math.sin(phi+Math.PI/2);
-        if(isNaN(tempV1X)||isNaN(tempV1Y)||isNaN(tempV2X)||isNaN(tempV2Y)){
-          console.log(theta2);
-          console.log(other.velocityY);
-          console.log(v2);
-          console.log(phi);
-          console.log(dy);
-          console.log(dis);
-          console.log(theta1);
-          console.log(this.velocityY);
-          console.log(v1);
-          console.log("\n");
-        }
-        this.velocityX = tempV1X;
-        this.velocityY = tempV1Y;
-        other.velocityX = tempV2X;
-        other.velocityY = tempV2Y;
-        this.moveReally();
-        this.moveReally();
-        this.moveReally();
-        other.moveReally();
-        other.moveReally();
-        other.moveReally();*/
       }
     }
+  }
+
+  Ball.prototype.checkLineCollision = function(){
+    for(var i=0;i<lineArray.length;i++){
+      var distance = this.lineDistance(lineArray[i]);
+      if(distance < RADIUS){
+        var normalSlope = -1/lineArray[i].slope;
+        var normal = new Vector(1, normalSlope);
+        var velocitySlope = this.velocityX/(this.velocityY+1e-10); //no divide by 0
+        this.velocity = new Vector(this.velocityX, this.velocityY);
+        var perpAngle = Math.acos(dotProduct(this.velocity, normal)/(this.velocity.magnitude*normal.magnitude));
+        var u = new Vector((dotProduct(this.velocity, normal)/dotProduct(normal, normal))*normal.x, (dotProduct(this.velocity, normal)/dotProduct(normal, normal))*normal.y);
+        var w = new Vector(this.velocity.x-u.x, this.velocity.y-u.y);
+        this.velocity = new Vector(w.x-u.x, w.y-u.y);
+        this.velocityX = this.velocity.x;
+        this.velocityY = this.velocity.y;
+      }
+    }
+  }
+
+  Ball.prototype.lineDistance = function(line){
+    return Math.abs((line.y2-line.y1)*this.x-(line.x2-line.x1)*this.y+line.x2*line.y1-line.y2*line.x1)/(Math.pow(Math.pow(line.x1-line.x2, 2) + Math.pow(line.y1-line.y2, 2), 0.5)); //thanks wikipedia
+  }
+
+  var Line = function(x1, y1, x2, y2){
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
+    this.slope = (y2-y1)/(x2-x1);
+  }
+
+  Line.prototype.draw = function(){
+    ctx.beginPath();
+    ctx.moveTo(this.x1, this.y1);
+    ctx.strokeStyle = "#000";
+    ctx.lineTo(this.x2, this.y2);
+    ctx.stroke();
+
   }
 
   function dotProduct(v1, v2){
@@ -174,6 +184,7 @@ window.onload = function(){
   }
 
   canvas.addEventListener("mousedown", function(event){
+    if(event.which == 3)return;
     startClickLocation = getMousePos(canvas, event);
     tempEndLocation.x = startClickLocation.x;
     tempEndLocation.y = startClickLocation.y;
@@ -185,6 +196,7 @@ window.onload = function(){
   });
 
   canvas.addEventListener("mouseup", function(event){
+    if(event.which == 3)return;
     endClickLocation = getMousePos(canvas, event);
     drawTrajectory(startClickLocation, endClickLocation, "#FFF");
     isMouseDown = false;
@@ -193,6 +205,7 @@ window.onload = function(){
   });
 
   canvas.addEventListener("mousemove", function(event){
+    if(event.which == 3)return;
     if(isMouseDown){
       tempEndLocation = getMousePos(canvas, event);
       drawTrajectory(startClickLocation, tempPrevEndLocation, "#FFF");
@@ -203,6 +216,18 @@ window.onload = function(){
     }
   });
 
+  canvas.addEventListener("contextmenu", function(event){
+    event.preventDefault();
+    var loc = getMousePos(canvas, event);
+    if(isRightMouseDown){
+      lineArray.push(new Line(start.x, start.y, loc.x, loc.y));
+    } else {
+      start = loc;
+    }
+    isRightMouseDown = !isRightMouseDown;
+    return false;
+  }, false);
+
   var animate = function(){
     ctx.fillStyle = "#FFF";
     ctx.fillRect(0,0,width,height);
@@ -212,9 +237,11 @@ window.onload = function(){
       }
       ballArray[i].move();
       if(ballArray[i].x<-200||ballArray[i].x>width+200||ballArray[i].y>height+200||ballArray[i].life<=0){
-        ballArray[i].erase();
         ballArray.splice(i,1);
       }
+    }
+    for(var i=0;i<lineArray.length;i++){
+      lineArray[i].draw();
     }
     window.requestAnimationFrame(animate);
   }
