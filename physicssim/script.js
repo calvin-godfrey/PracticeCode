@@ -119,6 +119,8 @@ window.onload = function(){
   Ball.prototype.checkLineCollision = function(){
     for(var i=0;i<lineArray.length;i++){
       var distance = this.lineDistance(lineArray[i]);
+      if(this.x<lineArray[i].x1&&this.x<lineArray[i].x2)continue;
+      if(this.x>lineArray[i].x1&&this.x>lineArray[i].x2)continue;
       if(distance < RADIUS){
         var normalSlope = -1/lineArray[i].slope;
         var normal = new Vector(1, normalSlope);
