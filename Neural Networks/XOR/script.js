@@ -98,6 +98,15 @@ window.onload = function(){
   }
 
   function eliminate(networks){ //networks should be sorted by fitness
+<<<<<<< HEAD
+    for(var i=0;i<networks.length;i++){
+      var chance = Math.random()*(i*0.5+10);
+      if(chance > 9.5){
+        networks[i] = 0;
+      }
+    }
+    return networks.filter(function(a){return a!=0}); //Remove all the 0's
+=======
     return networks.splice(0, 2);
     /*for(var i=0;i<networks.length;i++){
       var chance = Math.random()*(i*0.5+10);
@@ -106,6 +115,7 @@ window.onload = function(){
       }
     }
     *///return networks.filter(function(a){return a!=0}); //Remove all the 0's
+>>>>>>> a8c0f5a3cb202113d39b95f77db5deabc827b6b3
   }
 
   function populate(networks, size){
@@ -144,7 +154,7 @@ window.onload = function(){
         if(i!=0){
           var bias1 = neuron1.bias;
           var bias2 = neuron2.bias;
-          newValues[i][j].push((bias1+bias2)/2);// + (-1*Math.random()+0.5));
+          newValues[i][j].push((bias1+bias2)/2 + (-1*Math.random()+0.5));
         }
       }
     }
@@ -171,7 +181,7 @@ window.onload = function(){
     var networks = [];
 
     for(var i=0;i<50;i++){
-      networks.push(new Network([2, 2, 1], true));
+      networks.push(new Network([2, 1, 1], true));
     }
     for(var z=0;z<100;z++){
       console.log("--------------------");
