@@ -2,9 +2,11 @@ window.onload = function(){
   var canvas = document.getElementById("canvas");
   var collision = document.getElementById("collision");
   var useCollision;
+  var REBOUND;
   var checkCollision = setInterval(function(){
     useCollision = collision.checked;
-  }, 1000);
+    REBOUND = document.getElementById("rebound").value;
+  }, 100);
   canvas.width = screen.width;
   canvas.height = screen.height;
   var width = canvas.width;
@@ -16,7 +18,6 @@ window.onload = function(){
   var FACTOR = 0.08;
   var GRAVITY = 0.2; //Arbitrary number unrelated to 9.8 m/s^2
   var RADIUS = 20;
-  var REBOUND = -0.985; //For reason this "conserves energy"
   var MASS = 5;
   tempEndLocation = {x:null, y:null};
   tempPrevEndLocation = {x:null, y:null};
@@ -48,14 +49,12 @@ window.onload = function(){
     ctx.stroke();
     ctx.fillStyle = this.color;
     ctx.fill();
-    this.life-=1;
   }
 
   Ball.prototype.setup = function(endX, endY){
     this.velocityX = (this.x-endX)*FACTOR;
     this.velocityY = (this.y-endY)*FACTOR;
     this.isDone = true;
-    this.life=100000;
   }
 
   Ball.prototype.move = function(){
@@ -70,7 +69,7 @@ window.onload = function(){
   Ball.prototype.moveReally = function(){
     this.x += this.velocityX;
     this.y += this.velocityY;
-    this.velocityY += GRAVITY;
+    if(document.getElementById("gravity").checked)this.velocityY += GRAVITY;
     this.draw();
     this.prevX = this.x;
     this.prevY = this.y;
@@ -79,20 +78,19 @@ window.onload = function(){
   Ball.prototype.checkWallCollision = function(){
     if(this.x-RADIUS<=0){
       this.x = RADIUS;
-      this.velocityX *= REBOUND;
+      this.velocityX *= -REBOUND;
     }
     if(this.x+RADIUS>=width){
       this.x = width-RADIUS;
-      this.velocityX *= REBOUND;
+      this.velocityX *= -REBOUND;
     }
     if(this.y+RADIUS>=height){
       this.y = height-RADIUS;
-      this.velocityY *= REBOUND;
-      this.velocityX *= 0.97;
+      this.velocityY *= -REBOUND;
     }
     if(this.y-RADIUS<=0){
       this.y = RADIUS;
-      this.velocityY*=REBOUND;
+      this.velocityY *= -REBOUND;
     }
   }
 
@@ -130,8 +128,8 @@ window.onload = function(){
         var u = new Vector((dotProduct(this.velocity, normal)/dotProduct(normal, normal))*normal.x, (dotProduct(this.velocity, normal)/dotProduct(normal, normal))*normal.y);
         var w = new Vector(this.velocity.x-u.x, this.velocity.y-u.y);
         this.velocity = new Vector(w.x-u.x, w.y-u.y);
-        this.velocityX = this.velocity.x;
-        this.velocityY = this.velocity.y;
+        this.velocityX = this.velocity.x * REBOUND;
+        this.velocityY = this.velocity.y * REBOUND;
       }
     }
   }
@@ -230,6 +228,16 @@ window.onload = function(){
     return false;
   }, false);
 
+  function updateText(){
+    document.getElementById("dispRebound").innerHTML = REBOUND;
+    var energy = 0;
+    for(var i=0;i<ballArray.length;i++){
+      energy += ballArray[i].mass * Math.pow(Math.pow(ballArray[i].velocityX, 2)+Math.pow(ballArray[i].velocityY, 2), 0.85);
+      energy += ballArray[i].mass * GRAVITY * (canvas.height - ballArray[i].y);
+    }
+    document.getElementById("energy").innerHTML = Math.round(energy);
+  }
+
   var animate = function(){
     ctx.fillStyle = "#FFF";
     ctx.fillRect(0,0,width,height);
@@ -238,13 +246,14 @@ window.onload = function(){
         continue;
       }
       ballArray[i].move();
-      if(ballArray[i].x<-200||ballArray[i].x>width+200||ballArray[i].y>height+200||ballArray[i].life<=0){
+      if(ballArray[i].x<-200||ballArray[i].x>width+200||ballArray[i].y>height+200){
         ballArray.splice(i,1);
       }
     }
     for(var i=0;i<lineArray.length;i++){
       lineArray[i].draw();
     }
+    updateText();
     window.requestAnimationFrame(animate);
   }
 
